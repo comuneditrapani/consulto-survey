@@ -1,9 +1,9 @@
-.ms-ranking {
+.consulto-ranking {
     list-style: none;
     padding-left: 0;
 }
 
-.ms-ranking li {
+.consulto-ranking li {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -14,16 +14,16 @@
     cursor: grab;
 }
 
-.ms-ranking li:active {
+.consulto-ranking li:active {
     cursor: grabbing;
 }
 
-.ms-handle {
+.consulto-handle {
     font-size: 18px;
     opacity: 0.6;
     cursor: grab;
 }
 
-.ms-label {
+.consulto-label {
     flex: 1;
 }

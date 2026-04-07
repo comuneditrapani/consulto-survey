@@ -113,18 +113,18 @@ function msBindInputs() {
 }
 
 function msInitSections() {
-    msSections = Array.from(document.querySelectorAll('.ms-section'));
+    msSections = Array.from(document.querySelectorAll('.consulto-section'));
 
     msSections.forEach((sec, i) => {
         sec.style.display = (i === 0) ? 'block' : 'none';
     });
-    document.getElementById('ms-summary').style.display = 'none';
+    document.getElementById('consulto-summary').style.display = 'none';
 
     msCurrentIndex = 0;
 }
 
 function msInitRanking() {
-    const lists = document.querySelectorAll('.ms-ranking');
+    const lists = document.querySelectorAll('.consulto-ranking');
 
     lists.forEach(list => {
         let dragged = null;
@@ -184,7 +184,7 @@ function msPrev() {
 
 function msGoToSummary() {
     msSections[msCurrentIndex].style.display = 'none';
-    const summary = document.getElementById('ms-summary');
+    const summary = document.getElementById('consulto-summary');
     summary.style.display = 'block';
     msRenderSummary();
 }
@@ -230,7 +230,7 @@ function msRenderSummary() {
 
 function msBackFromSummary() {
     // nascondi summary
-    document.getElementById('ms-summary').style.display = 'none';
+    document.getElementById('consulto-summary').style.display = 'none';
     // torna alla sezione precedente
     msCurrentIndex = msLastSectionIndex;
     msSections[msCurrentIndex].style.display = 'block';

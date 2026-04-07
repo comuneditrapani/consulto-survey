@@ -1,6 +1,6 @@
 <?php
 
-function ms_render_survey() {
+function consulto_render_survey() {
 
     $survey = [
         'sections' => [
@@ -118,16 +118,16 @@ function ms_render_survey() {
 ?>
 
 <form method="post">
-  <?php wp_nonce_field('ms_survey_submit', 'ms_nonce'); ?>
-  <input type="hidden" name="ms_form_submitted" value="1">
+  <?php wp_nonce_field('consulto_survey_submit', 'consulto_nonce'); ?>
+  <input type="hidden" name="consulto_form_submitted" value="1">
 
   <?php foreach ($survey['sections'] as $i => $section): ?>
 
-  <div class="ms-section" id="section-<?= $section['id'] ?>">
+  <div class="consulto-section" id="section-<?= $section['id'] ?>">
     <h3><?= $section['label'] ?></h3>
     <?php foreach ($section['questions'] as $q): ?>
     
-    <div class="ms-question">
+    <div class="consulto-question">
       <p><?= $q['label'] ?></p>
       <?php
         // SINGLE CHOICE
@@ -161,11 +161,11 @@ function ms_render_survey() {
         // RANKING
         elseif ($q['type'] === 'ranking'):
         ?>
-      <ul class="ms-ranking" data-question="<?= $q['id'] ?>">
+      <ul class="consulto-ranking" data-question="<?= $q['id'] ?>">
         <?php foreach ($q['options'] as $opt): ?>
         <li draggable="true" data-value="<?= $opt['value'] ?>">
-          <span class="ms-handle">&#x2630;</span>
-          <span class="ms-label"><?= $opt['label'] ?></span>
+          <span class="consulto-handle">&#x2630;</span>
+          <span class="consulto-label"><?= $opt['label'] ?></span>
         </li>
         <?php endforeach; ?>
 
@@ -178,7 +178,7 @@ function ms_render_survey() {
     </div>
 
     <?php endforeach; ?>
-    <div class="ms-nav">
+    <div class="consulto-nav">
       <?php if ($i > 0): ?>
       <button type="button" data-i18n="prev" onclick="msPrev()"></button>
       <?php endif; ?>
@@ -193,7 +193,7 @@ function ms_render_survey() {
 
   <?php endforeach; ?>
 
-  <div id="ms-summary" style-"display:none;">
+  <div id="consulto-summary" style-"display:none;">
     <h3>Summary</h3>
     <div id="summary-content"></div>
     <button type="button" onclick="msBackFromSummary()" data-i18n="back_to_edit"></button>

@@ -3,17 +3,17 @@
 add_action('template_redirect', function() {
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') return;
-    if (!isset($_POST['ms_form_submitted'])) return;
+    if (!isset($_POST['consulto_form_submitted'])) return;
 
-    if (!isset($_POST['ms_nonce']) ||
-        !wp_verify_nonce($_POST['ms_nonce'], 'ms_survey_submit')) {
+    if (!isset($_POST['consulto_nonce']) ||
+        !wp_verify_nonce($_POST['consulto_nonce'], 'consulto_survey_submit')) {
         return;
     }
 
     global $wpdb;
 
-    $table_replies = $wpdb->prefix . 'ms_replies';
-    $table_answers = $wpdb->prefix . 'ms_answers';
+    $table_replies = $wpdb->prefix . 'consulto_replies';
+    $table_answers = $wpdb->prefix . 'consulto_answers';
 
     $wpdb->insert($table_replies, [
         'created_at' => current_time('mysql'),
