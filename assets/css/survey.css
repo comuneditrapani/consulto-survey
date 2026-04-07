@@ -1,0 +1,29 @@
+.ms-ranking {
+    list-style: none;
+    padding-left: 0;
+}
+
+.ms-ranking li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 4px;
+    background: #fafafa;
+    cursor: grab;
+}
+
+.ms-ranking li:active {
+    cursor: grabbing;
+}
+
+.ms-handle {
+    font-size: 18px;
+    opacity: 0.6;
+    cursor: grab;
+}
+
+.ms-label {
+    flex: 1;
+}
