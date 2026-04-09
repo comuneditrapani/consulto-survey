@@ -138,7 +138,7 @@ c.init.bindForm = function () {
     if (!form) return;
 
     form.addEventListener('submit', function () {
-        document.getElementById('consulto_payload').value =
+        document.getElementById('consulto-payload').value =
             JSON.stringify(c.answers);
     });
 };

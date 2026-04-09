@@ -12,7 +12,7 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
 
 <form id="consulto-form" method="post">
   <?php wp_nonce_field('consulto_survey_submit', 'consulto_nonce'); ?>
-  <input type="hidden" id="consulto_payload" name="consulto_payload" value="">
+  <input type="hidden" id="consulto-payload" name="consulto_payload" value="">
 
   <?php foreach ($survey['sections'] as $i => $section): ?>
 
