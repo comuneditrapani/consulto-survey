@@ -29,8 +29,8 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
             ?>
       <label>
         <input type="radio"
-               data-question="<?= $q['id'] ?>"
-               name="tmp_<?= $q['id'] ?>"
+               data-question="<?= $q['slug'] ?>"
+               name="<?= $q['slug'] ?>"
                value="<?= $opt['value'] ?>">
         <?= $opt['label'] ?>
       </label><br>
@@ -43,8 +43,8 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
       ?>
       <label>
         <input type="radio"
-               data-question="<?= $q['id'] ?>"
-               name="tmp_<?= $q['id'] ?>"
+               data-question="<?= $q['slug'] ?>"
+               name="<?= $q['slug'] ?>"
                value="<?= $j ?>">
         <?= $j ?>
       </label>
