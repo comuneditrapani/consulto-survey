@@ -54,7 +54,7 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
         // RANKING
         elseif ($q['type'] === 'ranking'):
         ?>
-      <ul class="consulto-ranking" data-question="<?= $q['id'] ?>">
+      <ul class="consulto-ranking" data-question="<?= $q['slug'] ?>">
         <?php foreach ($q['options'] as $opt): ?>
         <li draggable="true" data-value="<?= $opt['value'] ?>">
           <span class="consulto-handle">&#x2630;</span>
@@ -73,12 +73,12 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
     <?php endforeach; ?>
     <div class="consulto-nav">
       <?php if ($i > 0): ?>
-      <button type="button" data-i18n="prev" onclick="msPrev()"></button>
+      <button type="button" data-i18n="prev" onclick="c.ui.prev()"></button>
       <?php endif; ?>
       <?php if ($i < count($survey['sections']) - 1): ?>
-      <button type="button" data-i18n="next" onclick="msNext()"></button>
+      <button type="button" data-i18n="next" onclick="c.ui.next()"></button>
       <?php else: ?>
-      <button type="button" data-i18n="review" onclick="msGoToSummary()"></button>
+      <button type="button" data-i18n="review" onclick="c.ui.gotoSummary()"></button>
       <?php endif; ?>
     </div>
 
@@ -86,10 +86,10 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
 
   <?php endforeach; ?>
 
-  <div id="consulto-summary" style-"display:none;">
+  <div id="consulto-summary" style="display:none;">
     <h3>Summary</h3>
     <div id="summary-content"></div>
-    <button type="button" onclick="msBackFromSummary()" data-i18n="back_to_edit"></button>
+    <button type="button" onclick="c.ui.backFromSummary()" data-i18n="back_to_edit"></button>
     <button type="submit" data-i18n="submit"></button>
   </div>
 
