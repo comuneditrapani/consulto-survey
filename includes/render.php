@@ -61,9 +61,18 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
           <span class="consulto-label"><?= $opt['label'] ?></span>
         </li>
         <?php endforeach; ?>
-
       </ul>
-
+      <label>
+        <input type="checkbox" id="data-ranking-enable">
+        <span data-i18n="ranking_is_valid"></span>
+      </label>
+      <?php
+        elseif ($q['type'] === 'textarea'):
+      ?>
+      <textarea
+        data-question="<?= $q['slug'] ?>"
+        placeholder="<?= $q['label'] ?>"
+        ></textarea>
       <?php
        endif;
       ?>

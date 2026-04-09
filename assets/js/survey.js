@@ -52,29 +52,34 @@ c.ui.backFromSummary = function () {
 
 c.ui.renderSummary = function () {
     const div = document.getElementById('summary-content');
-    const parts = [];
+    div.innerHTML = '';
+
     for (const [q, value] of Object.entries(c.answers)) {
 
-        const label = c.i18n.t(q);
+        const p = document.createElement('p');
+
+        const strong = document.createElement('strong');
+        strong.textContent = c.i18n.t(q);
+
         const displayValue = Array.isArray(value)
-              ? value.map(v => c.i18n.t(v)).join(' > ')
-              : c.i18n.t(value);
+            ? value.map(v => c.i18n.t(v)).join(' > ')
+            : c.i18n.t(value);
 
-        parts.push(`<p><strong>${label}</strong>: ${displayValue}</p>`);
+        p.append(strong, ': ', displayValue);
+
+        div.appendChild(p);
     }
-
-    div.innerHTML = parts.join('');
 };
 
-c.ranking = {
-    update: function (list) {
-        const q = list.dataset.question;
-        const values = Array.from(list.querySelectorAll('li'))
-              .map(li => li.dataset.value);
-
-        c.answers[q] = values;
-        if(c.debug) console.log('RANKING:', values);
-    }
+c.ranking.question = null;
+c.ranking.enabled = false;
+c.ranking.update = function (list) {
+    const q = list.dataset.question;
+    c.ranking.question = q;
+    const values = Array.from(list.querySelectorAll('li'))
+          .map(li => li.dataset.value);
+    c.answers[q] = values;
+    if(c.debug) console.log('RANKING:', values);
 };
 
 c.i18n = {
@@ -147,12 +152,10 @@ c.init.bindInputs = function () {
     const elements = document.querySelectorAll('.consulto-section input, .consulto-section textarea, .consulto-section select');
 
     elements.forEach(el => {
-
         const q = el.dataset.question;
         if (!q) return;
 
         el.addEventListener('change', () => {
-
             let value;
 
             if (el.type === 'checkbox') {
@@ -169,6 +172,13 @@ c.init.bindInputs = function () {
             if(c.debug) console.log('STATE:', c.answers);
         });
     });
+    const cb = document.getElementById("data-ranking-enable");
+    if (cb) {
+        cb.addEventListener('change', () => {
+            c.ranking.enable = cb.checked;
+            if(!cb.checked) c.answers[c.ranking.question] = null;
+        });
+    }
 };
 
 c.init.sections = function () {
@@ -183,10 +193,13 @@ c.init.sections = function () {
 };
 
 c.init.ranking = function() {
+    // funziona sempre solo con un unico .consulto-ranking;
     const lists = document.querySelectorAll('.consulto-ranking');
 
     lists.forEach(list => {
         let dragged = null;
+        c.ranking.question = list;
+        c.ranking.enabled = false;
         list.querySelectorAll('li').forEach(item => {
             item.addEventListener('dragstart', () => {
                 dragged = item;
@@ -198,6 +211,9 @@ c.init.ranking = function() {
 
             item.addEventListener('drop', (event) => {
                 if (dragged === item) return;
+                c.ranking.enable = true;
+                document.getElementById("data-ranking-enable").
+                    checked = true;
 
                 const rect = item.getBoundingClientRect();
                 const after = (event.clientY - rect.top) > rect.height / 2;
