@@ -12,6 +12,7 @@
 
 add_shortcode('consulto_survey', 'consulto_render_survey');
 
+require_once __DIR__.'/includes/survey.php';
 require_once __DIR__.'/includes/render.php';
 require_once __DIR__.'/includes/save.php';
 
@@ -23,11 +24,21 @@ add_action('wp_enqueue_scripts', function() {
         null,
         true
     );
+
+    $survey = consulto_get_survey_definiton();
+
+    wp_add_inline_script(
+        'consulto-survey-js',
+        'window.consulto = window.consulto || {}; window.consulto.config = ' . json_encode($survey) . ';',
+        'before'
+    );
+
     wp_enqueue_style(
         'consulto-survey-style',
         plugins_url('assets/css/survey.css', __FILE__)
     );
 });
+
 
 register_activation_hook(__FILE__, 'consulto_create_tables');
 

@@ -1,129 +1,22 @@
 <?php
-
-function consulto_render_survey() {
-
-    $survey = [
-        'sections' => [
-            [
-                'id' => 'A',
-                'label' => 'Profile',
-                'questions' => [
-                    [
-                        'id' => 'Q1',
-                        'type' => 'single',
-                        'label' => 'You are:',
-                        'options' => [
-                            ['value' => 'resident', 'label' => 'Resident'],
-                            ['value' => 'resident_partial', 'label' => 'Resident part-time'],
-                            ['value' => 'visitor', 'label' => 'Visitor'],
-                            ['value' => 'business', 'label' => 'Business operator'],
-                            ['value' => 'other', 'label' => 'Other'],
-                        ]
-                    ],
-                    [
-                        'id' => 'Q2',
-                        'type' => 'single',
-                        'label' => 'Age group:',
-                        'options' => [
-                            ['value' => 'under_18', 'label' => 'Under 18'],
-                            ['value' => '18_29', 'label' => '18–29'],
-                            ['value' => '30_44', 'label' => '30–44'],
-                            ['value' => '45_65', 'label' => '45-65'],
-                            ['value' => 'over_65', 'label' => 'Over 65'],
-                        ]
-                    ],
-                ]
-            ],
-            [
-                'id' => 'B',
-                'label' => 'Usage',
-                'questions' => [
-                    [
-                        'id' => 'Q3',
-                        'type' => 'single',
-                        'label' => 'How often do you use the historic city center?',
-                        'options' => [
-                            ['value' => 'daily', 'label' => 'Daily'],
-                            ['value' => 'weekly', 'label' => 'Weekly'],
-                        ]
-                    ],
-                    [
-                        'id' => 'Q4',
-                        'type' => 'single',
-                        'label' => 'Main transport:',
-                        'options' => [
-                            ['value' => 'car', 'label' => 'Car'],
-                            ['value' => 'foot', 'label' => 'Walking'],
-                            ['value' => 'bus', 'label' => 'Public transport'],
-                            ['value' => 'bike', 'label' => 'bicycle'],
-                        ]
-                    ],
-                ]
-            ],
-            [
-                'id' => 'C',
-                'label' => 'Perception',
-                'questions' => [
-                    [
-                        'id' => 'Q5',
-                        'type' => 'scale',
-                        'label' => 'Quality of public spaces (1–5):',
-                        'min' => 1,
-                        'max' => 5
-                    ],
-                    [
-                        'id' => 'Q6',
-                        'type' => 'scale',
-                        'label' => 'Quality of urban mobility (1–5):',
-                        'min' => 1,
-                        'max' => 5
-                    ],
-                ]
-            ],
-            [
-                'id' => 'D',
-                'label' => 'Priorities',
-                'questions' => [
-                    [
-                        'id' => 'Q7',
-                        'type' => 'ranking',
-                        'label' => 'Order of priority:',
-                        'options' => [
-                            ['value' => 'car', 'label' => 'Improvement of car mobility'],
-                            ['value' => 'pedestrian', 'label' => 'improvement of pedestrian mobility'],
-                            ['value' => 'cycling', 'label' => 'Development of cycling infrastructure'],
-                            ['value' => 'green', 'label' => 'Green areas'],
-                            ['value' => 'family', 'label' => 'Services for families'],
-                            ['value' => 'buses', 'label' => 'Public transport'],
-                            ['value' => 'drainage', 'label' => 'Properness of roads'],
-                            ['value' => 'aesthetic', 'label' => 'Urban aesthetic improvement'],
-                        ]
-                    ],
-                    [
-                        'id' => 'Q8',
-                        'type' => 'single',
-                        'label' => 'Trade pedestrian spaces for more parking lots:',
-                        'options' => [
-                            ['value' => 'favour', 'label' => 'favour'],
-                            ['value' => 'neutral', 'label' => 'neutral'],
-                            ['value' => 'against', 'label' => 'against'],
-                        ]
-                    ],
-                ]
-            ]
-        ]
-    ];
-
-    ob_start();
+  require_once __DIR__.'/survey.php';
+  function consulto_render_survey() {
+      $survey = consulto_get_survey_definiton();
+      ob_start();
 ?>
 
-<form method="post">
+<script>
+window.consulto = window.consulto || {}; // potrebbe venire dal JS
+window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
+</script>
+
+<form id="consulto-form" method="post">
   <?php wp_nonce_field('consulto_survey_submit', 'consulto_nonce'); ?>
-  <input type="hidden" name="consulto_form_submitted" value="1">
+  <input type="hidden" id="consulto_payload" name="consulto_payload" value="">
 
   <?php foreach ($survey['sections'] as $i => $section): ?>
 
-  <div class="consulto-section" id="section-<?= $section['id'] ?>">
+  <div class="consulto-section" id="section-<?= $section['slug'] ?>">
     <h3><?= $section['label'] ?></h3>
     <?php foreach ($section['questions'] as $q): ?>
     
