@@ -16,6 +16,14 @@ require_once __DIR__.'/includes/survey.php';
 require_once __DIR__.'/includes/render.php';
 require_once __DIR__.'/includes/save.php';
 
+wp_enqueue_script(
+    'sortablejs',
+    'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js',
+    [],
+    null,
+    true
+);
+
 add_action('wp_enqueue_scripts', function() {
     wp_enqueue_script(
         'consulto-survey',

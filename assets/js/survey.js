@@ -56,6 +56,9 @@ c.ui.renderSummary = function () {
 
     for (const [q, value] of Object.entries(c.answers)) {
 
+        if(q == c.ranking.question && !c.ranking.enabled)
+            continue;
+
         const p = document.createElement('p');
 
         const strong = document.createElement('strong');
@@ -71,15 +74,14 @@ c.ui.renderSummary = function () {
     }
 };
 
-c.ranking.question = null;
-c.ranking.enabled = false;
+c.ranking.question = null; // il nome del ranking
+c.ranking.enabled = false; // se il ranking è confermato
 c.ranking.update = function (list) {
     const q = list.dataset.question;
     c.ranking.question = q;
     const values = Array.from(list.querySelectorAll('li'))
           .map(li => li.dataset.value);
     c.answers[q] = values;
-    if(c.debug) console.log('RANKING:', values);
 };
 
 c.i18n = {
@@ -143,6 +145,8 @@ c.init.bindForm = function () {
     if (!form) return;
 
     form.addEventListener('submit', function () {
+        if(!c.ranking.enabled && c.ranking.question in c.answers)
+            delete c.answers[c.ranking.question];
         document.getElementById('consulto-payload').value =
             JSON.stringify(c.answers);
     });
@@ -172,11 +176,10 @@ c.init.bindInputs = function () {
             if(c.debug) console.log('STATE:', c.answers);
         });
     });
-    const cb = document.getElementById("data-ranking-enable");
+    const cb = document.getElementById("data-ranking-enabled");
     if (cb) {
         cb.addEventListener('change', () => {
-            c.ranking.enable = cb.checked;
-            if(!cb.checked) c.answers[c.ranking.question] = null;
+            c.ranking.enabled = cb.checked;
         });
     }
 };
@@ -196,38 +199,19 @@ c.init.ranking = function() {
     // funziona sempre solo con un unico .consulto-ranking;
     const lists = document.querySelectorAll('.consulto-ranking');
 
-    lists.forEach(list => {
-        let dragged = null;
-        c.ranking.question = list;
+    lists.forEach(function(el) {
         c.ranking.enabled = false;
-        list.querySelectorAll('li').forEach(item => {
-            item.addEventListener('dragstart', () => {
-                dragged = item;
-            });
-
-            item.addEventListener('dragover', (e) => {
-                e.preventDefault();
-            });
-
-            item.addEventListener('drop', (event) => {
-                if (dragged === item) return;
-                c.ranking.enable = true;
-                document.getElementById("data-ranking-enable").
+        new Sortable(el, {
+            animation: 150,
+            ghostClass: 'dragging',
+            onSort: function() {
+                c.ranking.enabled = true;
+                c.ranking.update(el);
+                document.getElementById("data-ranking-enabled").
                     checked = true;
-
-                const rect = item.getBoundingClientRect();
-                const after = (event.clientY - rect.top) > rect.height / 2;
-
-                if (after) {
-                    item.after(dragged);
-                } else {
-                    item.before(dragged);
-                }
-
-                c.ranking.update(list);
-            });
+            }
         });
-        c.ranking.update(list);
+        c.ranking.update(el);
     });
 };
 

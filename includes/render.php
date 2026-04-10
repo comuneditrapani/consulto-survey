@@ -1,5 +1,18 @@
 <?php
   require_once __DIR__.'/survey.php';
+
+  function consulto_t($slug, $lang = 'it') {
+      static $map = null;
+
+      if ($map === null) {
+          $map = consulto_get_i18n_map();
+      }
+
+      return $map[$slug][$lang]
+      ?? $map[$slug]['en']
+      ?? $slug;
+  }
+
   function consulto_render_survey() {
       $survey = consulto_get_survey_definiton();
       ob_start();
@@ -16,12 +29,12 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
 
   <?php foreach ($survey['sections'] as $i => $section): ?>
 
-  <div class="consulto-section" id="section-<?= $section['slug'] ?>">
-    <h3><?= $section['label'] ?></h3>
+  <div class="consulto-section" id="section-<?= esc_attr($section['slug']) ?>">
+    <h3><?= esc_html(consulto_t($section['slug'])) ?></h3>
     <?php foreach ($section['questions'] as $q): ?>
-    
+
     <div class="consulto-question">
-      <p><?= $q['label'] ?></p>
+      <p><?= esc_html(consulto_t($q['slug'])) ?></p>
       <?php
         // SINGLE CHOICE
         if ($q['type'] === 'single'):
@@ -29,22 +42,22 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
             ?>
       <label>
         <input type="radio"
-               data-question="<?= $q['slug'] ?>"
-               name="<?= $q['slug'] ?>"
-               value="<?= $opt['value'] ?>">
-        <?= $opt['label'] ?>
+               data-question="<?= esc_attr($q['slug']) ?>"
+               name="<?= esc_attr($q['slug']) ?>"
+               value="<?= esc_attr($opt['value']) ?>">
+        <?= esc_html(consulto_t($opt['slug'])) ?>
       </label><br>
       <?php
            endforeach;
-           
+
         // SCALE
         elseif ($q['type'] === 'scale'):
             for ($j = $q['min']; $j <= $q['max']; $j++):
       ?>
       <label>
         <input type="radio"
-               data-question="<?= $q['slug'] ?>"
-               name="<?= $q['slug'] ?>"
+               data-question="<?= esc_attr($q['slug']) ?>"
+               name="<?= esc_attr($q['slug']) ?>"
                value="<?= $j ?>">
         <?= $j ?>
       </label>
@@ -54,24 +67,23 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
         // RANKING
         elseif ($q['type'] === 'ranking'):
         ?>
-      <ul class="consulto-ranking" data-question="<?= $q['slug'] ?>">
+      <ul class="consulto-ranking" data-question="<?= esc_attr($q['slug']) ?>">
         <?php foreach ($q['options'] as $opt): ?>
-        <li draggable="true" data-value="<?= $opt['value'] ?>">
-          <span class="consulto-handle">&#x2630;</span>
-          <span class="consulto-label"><?= $opt['label'] ?></span>
+        <li data-value="<?= esc_attr($opt['value']) ?>">
+          <?= esc_html(consulto_t($opt['slug'])) ?>
         </li>
         <?php endforeach; ?>
       </ul>
       <label>
-        <input type="checkbox" id="data-ranking-enable">
+        <input type="checkbox" id="data-ranking-enabled">
         <span data-i18n="ranking_is_valid"></span>
       </label>
       <?php
         elseif ($q['type'] === 'textarea'):
       ?>
       <textarea
-        data-question="<?= $q['slug'] ?>"
-        placeholder="<?= $q['label'] ?>"
+        data-question="<?= esc_attr($q['slug']) ?>"
+        placeholder="<?= esc_html(consulto_t($q['slug'])) ?>"
         ></textarea>
       <?php
        endif;
