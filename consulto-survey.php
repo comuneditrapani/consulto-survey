@@ -10,34 +10,53 @@
  * Text Domain: consulto-survey
 */
 
-add_shortcode('consulto_survey', 'ms_render_survey');
+add_shortcode('consulto_survey', 'consulto_render_survey');
 
+require_once __DIR__.'/includes/survey.php';
 require_once __DIR__.'/includes/render.php';
 require_once __DIR__.'/includes/save.php';
 
+wp_enqueue_script(
+    'sortablejs',
+    'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js',
+    [],
+    null,
+    true
+);
+
 add_action('wp_enqueue_scripts', function() {
     wp_enqueue_script(
-        'ms-survey',
+        'consulto-survey',
         plugins_url('assets/js/survey.js', __FILE__),
         [],
         null,
         true
     );
+
+    $survey = consulto_get_survey_definiton();
+
+    wp_add_inline_script(
+        'consulto-survey-js',
+        'window.consulto = window.consulto || {}; window.consulto.config = ' . json_encode($survey) . ';',
+        'before'
+    );
+
     wp_enqueue_style(
-        'ms-survey-style',
+        'consulto-survey-style',
         plugins_url('assets/css/survey.css', __FILE__)
     );
 });
 
-register_activation_hook(__FILE__, 'ms_create_tables');
 
-function ms_create_tables() {
+register_activation_hook(__FILE__, 'consulto_create_tables');
+
+function consulto_create_tables() {
     global $wpdb;
 
     $charset = $wpdb->get_charset_collate();
 
-    $table_replies = $wpdb->prefix . 'ms_replies';
-    $table_answers = $wpdb->prefix . 'ms_answers';
+    $table_replies = $wpdb->prefix . 'consulto_replies';
+    $table_answers = $wpdb->prefix . 'consulto_answers';
 
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 

@@ -1,134 +1,40 @@
 <?php
+  require_once __DIR__.'/survey.php';
 
-function ms_render_survey() {
+  function consulto_t($slug, $lang = 'it') {
+      static $map = null;
 
-    $survey = [
-        'sections' => [
-            [
-                'id' => 'A',
-                'label' => 'Profile',
-                'questions' => [
-                    [
-                        'id' => 'Q1',
-                        'type' => 'single',
-                        'label' => 'You are:',
-                        'options' => [
-                            ['value' => 'resident', 'label' => 'Resident'],
-                            ['value' => 'resident_partial', 'label' => 'Resident part-time'],
-                            ['value' => 'visitor', 'label' => 'Visitor'],
-                            ['value' => 'business', 'label' => 'Business operator'],
-                            ['value' => 'other', 'label' => 'Other'],
-                        ]
-                    ],
-                    [
-                        'id' => 'Q2',
-                        'type' => 'single',
-                        'label' => 'Age group:',
-                        'options' => [
-                            ['value' => 'under_18', 'label' => 'Under 18'],
-                            ['value' => '18_29', 'label' => '18–29'],
-                            ['value' => '30_44', 'label' => '30–44'],
-                            ['value' => '45_65', 'label' => '45-65'],
-                            ['value' => 'over_65', 'label' => 'Over 65'],
-                        ]
-                    ],
-                ]
-            ],
-            [
-                'id' => 'B',
-                'label' => 'Usage',
-                'questions' => [
-                    [
-                        'id' => 'Q3',
-                        'type' => 'single',
-                        'label' => 'How often do you use the historic city center?',
-                        'options' => [
-                            ['value' => 'daily', 'label' => 'Daily'],
-                            ['value' => 'weekly', 'label' => 'Weekly'],
-                        ]
-                    ],
-                    [
-                        'id' => 'Q4',
-                        'type' => 'single',
-                        'label' => 'Main transport:',
-                        'options' => [
-                            ['value' => 'car', 'label' => 'Car'],
-                            ['value' => 'foot', 'label' => 'Walking'],
-                            ['value' => 'bus', 'label' => 'Public transport'],
-                            ['value' => 'bike', 'label' => 'bicycle'],
-                        ]
-                    ],
-                ]
-            ],
-            [
-                'id' => 'C',
-                'label' => 'Perception',
-                'questions' => [
-                    [
-                        'id' => 'Q5',
-                        'type' => 'scale',
-                        'label' => 'Quality of public spaces (1–5):',
-                        'min' => 1,
-                        'max' => 5
-                    ],
-                    [
-                        'id' => 'Q6',
-                        'type' => 'scale',
-                        'label' => 'Quality of urban mobility (1–5):',
-                        'min' => 1,
-                        'max' => 5
-                    ],
-                ]
-            ],
-            [
-                'id' => 'D',
-                'label' => 'Priorities',
-                'questions' => [
-                    [
-                        'id' => 'Q7',
-                        'type' => 'ranking',
-                        'label' => 'Order of priority:',
-                        'options' => [
-                            ['value' => 'car', 'label' => 'Improvement of car mobility'],
-                            ['value' => 'pedestrian', 'label' => 'improvement of pedestrian mobility'],
-                            ['value' => 'cycling', 'label' => 'Development of cycling infrastructure'],
-                            ['value' => 'green', 'label' => 'Green areas'],
-                            ['value' => 'family', 'label' => 'Services for families'],
-                            ['value' => 'buses', 'label' => 'Public transport'],
-                            ['value' => 'drainage', 'label' => 'Properness of roads'],
-                            ['value' => 'aesthetic', 'label' => 'Urban aesthetic improvement'],
-                        ]
-                    ],
-                    [
-                        'id' => 'Q8',
-                        'type' => 'single',
-                        'label' => 'Trade pedestrian spaces for more parking lots:',
-                        'options' => [
-                            ['value' => 'favour', 'label' => 'favour'],
-                            ['value' => 'neutral', 'label' => 'neutral'],
-                            ['value' => 'against', 'label' => 'against'],
-                        ]
-                    ],
-                ]
-            ]
-        ]
-    ];
+      if ($map === null) {
+          $map = consulto_get_i18n_map();
+      }
 
-    ob_start();
+      return $map[$slug][$lang]
+      ?? $map[$slug]['en']
+      ?? $slug;
+  }
+
+  function consulto_render_survey() {
+      $survey = consulto_get_survey_definiton();
+      ob_start();
 ?>
 
-<form method="post">
-  <?php wp_nonce_field('ms_survey_submit', 'ms_nonce'); ?>
-  <input type="hidden" name="ms_form_submitted" value="1">
+<script>
+window.consulto = window.consulto || {}; // potrebbe venire dal JS
+window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
+</script>
+
+<form id="consulto-form" method="post">
+  <?php wp_nonce_field('consulto_survey_submit', 'consulto_nonce'); ?>
+  <input type="hidden" id="consulto-payload" name="consulto_payload" value="">
 
   <?php foreach ($survey['sections'] as $i => $section): ?>
 
-  <div class="ms-section" id="section-<?= $section['id'] ?>">
-    <h3><?= $section['label'] ?></h3>
+  <div class="consulto-section" id="section-<?= esc_attr($section['slug']) ?>">
+    <h3><?= esc_html(consulto_t($section['slug'])) ?></h3>
     <?php foreach ($section['questions'] as $q): ?>
-    
-    <div class="ms-question">
-      <p><?= $q['label'] ?></p>
+
+    <div class="consulto-question">
+      <p><?= esc_html(consulto_t($q['slug'])) ?></p>
       <?php
         // SINGLE CHOICE
         if ($q['type'] === 'single'):
@@ -136,22 +42,22 @@ function ms_render_survey() {
             ?>
       <label>
         <input type="radio"
-               data-question="<?= $q['id'] ?>"
-               name="tmp_<?= $q['id'] ?>"
-               value="<?= $opt['value'] ?>">
-        <?= $opt['label'] ?>
+               data-question="<?= esc_attr($q['slug']) ?>"
+               name="<?= esc_attr($q['slug']) ?>"
+               value="<?= esc_attr($opt['value']) ?>">
+        <?= esc_html(consulto_t($opt['slug'])) ?>
       </label><br>
       <?php
            endforeach;
-           
+
         // SCALE
         elseif ($q['type'] === 'scale'):
             for ($j = $q['min']; $j <= $q['max']; $j++):
       ?>
       <label>
         <input type="radio"
-               data-question="<?= $q['id'] ?>"
-               name="tmp_<?= $q['id'] ?>"
+               data-question="<?= esc_attr($q['slug']) ?>"
+               name="<?= esc_attr($q['slug']) ?>"
                value="<?= $j ?>">
         <?= $j ?>
       </label>
@@ -161,16 +67,24 @@ function ms_render_survey() {
         // RANKING
         elseif ($q['type'] === 'ranking'):
         ?>
-      <ul class="ms-ranking" data-question="<?= $q['id'] ?>">
+      <ul class="consulto-ranking" data-question="<?= esc_attr($q['slug']) ?>">
         <?php foreach ($q['options'] as $opt): ?>
-        <li draggable="true" data-value="<?= $opt['value'] ?>">
-          <span class="ms-handle">&#x2630;</span>
-          <span class="ms-label"><?= $opt['label'] ?></span>
+        <li data-value="<?= esc_attr($opt['value']) ?>">
+          <?= esc_html(consulto_t($opt['slug'])) ?>
         </li>
         <?php endforeach; ?>
-
       </ul>
-
+      <label>
+        <input type="checkbox" id="data-ranking-enabled">
+        <span data-i18n="ranking_is_valid"></span>
+      </label>
+      <?php
+        elseif ($q['type'] === 'textarea'):
+      ?>
+      <textarea
+        data-question="<?= esc_attr($q['slug']) ?>"
+        placeholder="<?= esc_html(consulto_t($q['slug'])) ?>"
+        ></textarea>
       <?php
        endif;
       ?>
@@ -178,14 +92,14 @@ function ms_render_survey() {
     </div>
 
     <?php endforeach; ?>
-    <div class="ms-nav">
+    <div class="consulto-nav">
       <?php if ($i > 0): ?>
-      <button type="button" data-i18n="prev" onclick="msPrev()"></button>
+      <button type="button" data-i18n="prev" onclick="c.ui.prev()"></button>
       <?php endif; ?>
       <?php if ($i < count($survey['sections']) - 1): ?>
-      <button type="button" data-i18n="next" onclick="msNext()"></button>
+      <button type="button" data-i18n="next" onclick="c.ui.next()"></button>
       <?php else: ?>
-      <button type="button" data-i18n="review" onclick="msGoToSummary()"></button>
+      <button type="button" data-i18n="review" onclick="c.ui.gotoSummary()"></button>
       <?php endif; ?>
     </div>
 
@@ -193,10 +107,10 @@ function ms_render_survey() {
 
   <?php endforeach; ?>
 
-  <div id="ms-summary" style-"display:none;">
+  <div id="consulto-summary" style="display:none;">
     <h3>Summary</h3>
     <div id="summary-content"></div>
-    <button type="button" onclick="msBackFromSummary()" data-i18n="back_to_edit"></button>
+    <button type="button" onclick="c.ui.backFromSummary()" data-i18n="back_to_edit"></button>
     <button type="submit" data-i18n="submit"></button>
   </div>
 

@@ -1,99 +1,165 @@
-const msState = {};
-let msSections = [];
-let msCurrentIndex = 0;
-let msLastSectionIndex = 0;
+window.consulto = window.consulto || {}; // potrebbe venire dal PHP
 
-const msLang = 'en'; // oppure 'it', 'es', 'fr', 'de'
+const c = window.consulto;
+// il PHP popola la struttura c.config, che definisce il questionario.
 
-const msI18n = {
-    en: {
-        next: 'Next',
-        prev: 'Back',
-        review: 'Review',
-        submit: 'Submit',
-        summary_title: 'Summary',
-        back_to_edit: 'Back to edit'
-    },
-    es: {
-        next: 'Siguiente',
-        prev: 'Anterior',
-        review: 'Revisar respuestas',
-        submit: 'Confirmar y enviar',
-        summary_title: 'Resumen',
-        back_to_edit: 'Volver a editar'
-    },
-    fr: {
-        next: 'suivant',
-        prev: 'précédent',
-        review: 'Vérifier vos réponses',
-        submit: 'confirmer et envoyer',
-        summary_title: 'récaputilatif',
-        back_to_edit: 'Retour à la modification'
-    },
-    de: {
-        next: 'Weiter',
-        prev: 'Zurück',
-        review: 'Antworten prüfen',
-        submit: 'Bestätigen und senden',
-        summary_title: 'Zusammenfassung',
-        back_to_edit: 'Zurück zur Bearbeitung'
-    },
-    it: {
-        next: 'Avanti',
-        prev: 'Indietro',
-        review: 'Riepilogo',
-        submit: 'Conferma e invia',
-        summary_title: 'Riepilogo',
-        back_to_edit: 'Torna al formulario'
+c.debug = true;  // logging sviluppo
+
+c.state = {};    // variabili di stato interno
+c.answers = {};  // le risposte, da restituire
+c.ui = {};       // funzioni interfaccia utente
+c.ranking = {};  // la porzione per il ranking
+c.i18n = {};     // internazionalizzazione
+c.init = {};     // inizializzazione
+
+// variabili di stato
+c.state.currentIndex = 0;
+c.state.lastSectionIndex = 0;
+c.state.sections = [];
+
+// le risposte c.answers vengono popolate poco a poco
+// avranno la forma slug=>value
+
+// le funzioni di gestione interfaccia utente
+c.ui.next = function () {
+    if (c.state.currentIndex >= c.state.sections.length - 1) return;
+
+    c.state.sections[c.state.currentIndex].style.display = 'none';
+    c.state.currentIndex++;
+    c.state.lastSectionIndex = c.state.currentIndex;
+    c.state.sections[c.state.currentIndex].style.display = 'block';
+};
+
+c.ui.prev = function () {
+    if (c.state.currentIndex <= 0) return;
+
+    c.state.sections[c.state.currentIndex].style.display = 'none';
+    c.state.currentIndex--;
+    c.state.sections[c.state.currentIndex].style.display = 'block';
+};
+
+c.ui.gotoSummary = function () {
+    c.state.sections[c.state.currentIndex].style.display = 'none';
+    document.getElementById('consulto-summary').style.display = 'block';
+    c.ui.renderSummary();
+};
+
+c.ui.backFromSummary = function () {
+    document.getElementById('consulto-summary').style.display = 'none';
+    c.state.currentIndex = c.state.lastSectionIndex;
+    c.state.sections[c.state.currentIndex].style.display = 'block';
+};
+
+c.ui.renderSummary = function () {
+    const div = document.getElementById('summary-content');
+    div.innerHTML = '';
+
+    for (const [q, value] of Object.entries(c.answers)) {
+
+        if(q == c.ranking.question && !c.ranking.enabled)
+            continue;
+
+        const p = document.createElement('p');
+
+        const strong = document.createElement('strong');
+        strong.textContent = c.i18n.t(q);
+
+        const displayValue = Array.isArray(value)
+            ? value.map(v => c.i18n.t(v)).join(' > ')
+            : c.i18n.t(value);
+
+        p.append(strong, ': ', displayValue);
+
+        div.appendChild(p);
     }
 };
 
-const msLabels = {
-    Q1: 'You are',
-    Q2: 'Age group',
-    Q3: 'Use of the historic city center',
-    Q4: 'Main mode of transport',
-    Q5: 'Quality of public spaces',
-    Q6: 'Functionality of urban mobility',
-    Q7: 'Priorities',
-    Q8: 'Trade-off',
-    Q9: 'What works best today',
-    Q10: 'What should be improved first'
+c.ranking.question = null; // il nome del ranking
+c.ranking.enabled = false; // se il ranking è confermato
+c.ranking.update = function (list) {
+    const q = list.dataset.question;
+    c.ranking.question = q;
+    const values = Array.from(list.querySelectorAll('li'))
+          .map(li => li.dataset.value);
+    c.answers[q] = values;
 };
 
-const msValueLabels = {
-    Q1: {
-        resident: 'Resident',
-        visitor: 'Visitor',
-        business: 'Business operator'
+c.i18n = {
+    lang: 'it',
+    dict: {
+        en: {
+            next: 'Next',
+            prev: 'Back',
+            review: 'Review',
+            submit: 'Submit',
+            summary_title: 'Summary',
+            back_to_edit: 'Back to edit'
+        },
+        es: {
+            next: 'Siguiente',
+            prev: 'Anterior',
+            review: 'Revisar respuestas',
+            submit: 'Confirmar y enviar',
+            summary_title: 'Resumen',
+            back_to_edit: 'Volver a editar'
+        },
+        fr: {
+            next: 'suivant',
+            prev: 'précédent',
+            review: 'Vérifier vos réponses',
+            submit: 'confirmer et envoyer',
+            summary_title: 'récaputilatif',
+            back_to_edit: 'Retour à la modification'
+        },
+        de: {
+            next: 'Weiter',
+            prev: 'Zurück',
+            review: 'Antworten prüfen',
+            submit: 'Bestätigen und senden',
+            summary_title: 'Zusammenfassung',
+            back_to_edit: 'Zurück zur Bearbeitung'
+        },
+        it: {
+            next: 'Avanti',
+            prev: 'Indietro',
+            review: 'Riepilogo',
+            submit: 'Conferma e invia',
+            summary_title: 'Riepilogo',
+            back_to_edit: 'Torna al formulario'
+        }
     },
-    Q2: {
-        under_18: 'Under 18',
-        '18_29': '18–29',
-        '30_44': '30–44'
+    apply: function () {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.dataset.i18n;
+            el.textContent = this.t(key);
+        });
+    },
+    t: function (key) {
+        return (this.dict[this.lang] && this.dict[this.lang][key]) || key;
     }
 };
 
-function msSubmit(action) {
-  document.getElementById('ranking_action').value = action;
+c.init.bindForm = function () {
+    const form = document.getElementById('consulto-form');
 
-  if (action === 'confirm') {
-    const items = document.querySelectorAll('#ranking li');
-    const order = [...items].map(li => li.dataset.id);
-    document.getElementById('ranking_result').value = JSON.stringify(order);
-  }
-}
+    if (!form) return;
 
-function msBindInputs() {
-    const elements = document.querySelectorAll('input, textarea, select');
+    form.addEventListener('submit', function () {
+        if(!c.ranking.enabled && c.ranking.question in c.answers)
+            delete c.answers[c.ranking.question];
+        document.getElementById('consulto-payload').value =
+            JSON.stringify(c.answers);
+    });
+};
+
+c.init.bindInputs = function () {
+    const elements = document.querySelectorAll('.consulto-section input, .consulto-section textarea, .consulto-section select');
 
     elements.forEach(el => {
-
         const q = el.dataset.question;
         if (!q) return;
 
         el.addEventListener('change', () => {
-
             let value;
 
             if (el.type === 'checkbox') {
@@ -105,152 +171,55 @@ function msBindInputs() {
                 value = el.value;
             }
 
-            msState[q] = value;
+            c.answers[q] = value;
 
-            console.log('STATE:', msState);
+            if(c.debug) console.log('STATE:', c.answers);
         });
     });
-}
+    const cb = document.getElementById("data-ranking-enabled");
+    if (cb) {
+        cb.addEventListener('change', () => {
+            c.ranking.enabled = cb.checked;
+        });
+    }
+};
 
-function msInitSections() {
-    msSections = Array.from(document.querySelectorAll('.ms-section'));
+c.init.sections = function () {
+    c.state.sections = Array.from(document.querySelectorAll('.consulto-section'));
 
-    msSections.forEach((sec, i) => {
+    c.state.sections.forEach((sec, i) => {
         sec.style.display = (i === 0) ? 'block' : 'none';
     });
-    document.getElementById('ms-summary').style.display = 'none';
+    document.getElementById('consulto-summary').style.display = 'none';
 
-    msCurrentIndex = 0;
-}
+    c.state.currentIndex = 0;
+};
 
-function msInitRanking() {
-    const lists = document.querySelectorAll('.ms-ranking');
+c.init.ranking = function() {
+    // funziona sempre solo con un unico .consulto-ranking;
+    const lists = document.querySelectorAll('.consulto-ranking');
 
-    lists.forEach(list => {
-        let dragged = null;
-        list.querySelectorAll('li').forEach(item => {
-            item.addEventListener('dragstart', () => {
-                dragged = item;
-            });
-
-            item.addEventListener('dragover', (e) => {
-                e.preventDefault();
-            });
-
-            item.addEventListener('drop', (event) => {
-                if (dragged === item) return;
-
-                const rect = item.getBoundingClientRect();
-                const after = (event.clientY - rect.top) > rect.height / 2;
-
-                if (after) {
-                    item.after(dragged);
-                } else {
-                    item.before(dragged);
-                }
-
-                msUpdateRanking(list);
-            });
+    lists.forEach(function(el) {
+        c.ranking.enabled = false;
+        new Sortable(el, {
+            animation: 150,
+            ghostClass: 'dragging',
+            onSort: function() {
+                c.ranking.enabled = true;
+                c.ranking.update(el);
+                document.getElementById("data-ranking-enabled").
+                    checked = true;
+            }
         });
-        msUpdateRanking(list);
+        c.ranking.update(el);
     });
-}
+};
 
-function msUpdateRanking(list) {
-    const q = list.dataset.question;
-    const values = Array.from(list.querySelectorAll('li'))
-        .map(li => li.dataset.value);
-
-    msState[q] = values;
-    console.log('RANKING:', values);
-}
-
-function msNext() {
-    if (msCurrentIndex >= msSections.length - 1) return;
-
-    msSections[msCurrentIndex].style.display = 'none';
-    msCurrentIndex++;
-    msLastSectionIndex = msCurrentIndex;
-    msSections[msCurrentIndex].style.display = 'block';
-}
-
-function msPrev() {
-    if (msCurrentIndex <= 0) return;
-
-    msSections[msCurrentIndex].style.display = 'none';
-    msCurrentIndex--;
-    msSections[msCurrentIndex].style.display = 'block';
-}
-
-function msGoToSummary() {
-    msSections[msCurrentIndex].style.display = 'none';
-    const summary = document.getElementById('ms-summary');
-    summary.style.display = 'block';
-    msRenderSummary();
-}
-
-function msPopulateHiddenInputs() {
-
-    // esempio per ranking (quando ci sarà)
-    if (msState['Q7']) {
-        document.getElementById('q7_priority_ranking').value =
-            Array.isArray(msState['Q7'])
-                ? msState['Q7'].join('>')
-                : msState['Q7'];
-    }
-
-    if (msState['Q7_action']) {
-        document.getElementById('q7_action').value =
-            msState['Q7_action'];
-    }
-}
-
-function msRenderSummary() {
-    const div = document.getElementById('summary-content');
-    const parts = [];
-    for (const [q, value] of Object.entries(msState)) {
-
-        const label = msLabels[q] || q;
-        let displayValue = value;
-
-        if (Array.isArray(value)) {
-            displayValue = value.map(v =>
-                (msValueLabels[q] && msValueLabels[q][v]) || v
-            ).join(' > ');
-        } else {
-            displayValue =
-                (msValueLabels[q] && msValueLabels[q][value]) || value;
-        }
-
-        parts.push(`<p><strong>${label}</strong>: ${displayValue}</p>`);
-    }
-
-    div.innerHTML = parts.join('');
-}
-
-function msBackFromSummary() {
-    // nascondi summary
-    document.getElementById('ms-summary').style.display = 'none';
-    // torna alla sezione precedente
-    msCurrentIndex = msLastSectionIndex;
-    msSections[msCurrentIndex].style.display = 'block';
-}
-
-function _(key) {
-    return msI18n[msLang][key] || key;
-}
-
-function msApplyTranslations() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.dataset.i18n;
-        el.textContent = _(key);
-    });
-}
 
 document.addEventListener('DOMContentLoaded', () => {
-    msBindInputs();
-    msInitSections();
-    msApplyTranslations();
-    msInitRanking();
+    c.init.sections();
+    c.init.bindInputs();
+    c.init.ranking();
+    c.init.bindForm();
+    c.i18n.apply();
 });
-
