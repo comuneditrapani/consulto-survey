@@ -75,9 +75,28 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
         <?php endforeach; ?>
       </ul>
       <label>
-        <input type="checkbox" id="data-ranking-enabled">
+        <input type="checkbox" id="<?= esc_attr($q['slug']) ?>-enabled">
         <span data-i18n="ranking_is_valid"></span>
       </label>
+      <?php
+        elseif ($q['type'] === 'ranking-partial'):
+        ?>
+      <div class="consulto-ranking-partial" data-question="<?= esc_attr($q['slug']) ?>">
+        <div class="consulto-ranking-selected">
+          <h4 data-i18n="ranking_selection"></h4>
+          <ul class="consulto-list consulto-selected"></ul>
+        </div>
+        <div class="consulto-ranking-pool">
+          <h4 data-i18n="ranking_pool"></h4>
+          <ul class="consulto-list consulto-pool">
+            <?php foreach ($q['options'] as $opt): ?>
+            <li data-value="<?= esc_attr($opt['value']) ?>">
+              <?= esc_html(consulto_t($opt['slug'])) ?>
+            </li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+      </div>
       <?php
         elseif ($q['type'] === 'textarea'):
       ?>

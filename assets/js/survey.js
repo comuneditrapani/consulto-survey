@@ -93,6 +93,9 @@ c.i18n = {
             review: 'Review',
             submit: 'Submit',
             summary_title: 'Summary',
+            ranking_selection: 'Selected priorities',
+            ranking_pool: 'Available options',
+            ranking_is_valid: 'Ranking confirmed',
             back_to_edit: 'Back to edit'
         },
         es: {
@@ -101,6 +104,9 @@ c.i18n = {
             review: 'Revisar respuestas',
             submit: 'Confirmar y enviar',
             summary_title: 'Resumen',
+            top_selection: 'Prioridades seleccionadas',
+            ranking_pool: 'Opciones disponibles',
+            ranking_is_valid: 'Clasificación confirmada',
             back_to_edit: 'Volver a editar'
         },
         fr: {
@@ -109,6 +115,9 @@ c.i18n = {
             review: 'Vérifier vos réponses',
             submit: 'confirmer et envoyer',
             summary_title: 'récaputilatif',
+            ranking_selection: 'Priorités sélectionnées',
+            ranking_pool: 'Options disponibles',
+            ranking_is_valid: 'Classement confirmé',
             back_to_edit: 'Retour à la modification'
         },
         de: {
@@ -117,6 +126,9 @@ c.i18n = {
             review: 'Antworten prüfen',
             submit: 'Bestätigen und senden',
             summary_title: 'Zusammenfassung',
+            ranking_selection: 'Ausgewählte Prioritäten',
+            ranking_pool: 'Verfügbare Optionen',
+            ranking_is_valid: 'Ranking bestätigt',
             back_to_edit: 'Zurück zur Bearbeitung'
         },
         it: {
@@ -125,6 +137,9 @@ c.i18n = {
             review: 'Riepilogo',
             submit: 'Conferma e invia',
             summary_title: 'Riepilogo',
+            ranking_selection: 'Priorità selezionate',
+            ranking_pool: 'Opzioni disponibili',
+            ranking_is_valid: 'Ordine confermato',
             back_to_edit: 'Torna al formulario'
         }
     },
