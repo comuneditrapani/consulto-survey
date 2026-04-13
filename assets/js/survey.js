@@ -234,10 +234,10 @@ c.init.ranking = function() {
 
         c.ranking.update(el);
     });
-    const pools = document.querySelectorAll('.consulto-ranking-partial');
+    const pools = document.querySelectorAll('.consulto-ranking-widget');
     pools.forEach(function(el) {
-        const selected = el.querySelector('.consulto-ranking-selected');
-        const pool = el.querySelector('.consulto-ranking-pool');
+        const selected = el.querySelector('.consulto-selected');
+        const pool = el.querySelector('.consulto-pool');
 
         // lista sinistra (ranking)
         new Sortable(selected, {
@@ -259,6 +259,23 @@ c.init.ranking = function() {
             },
             animation: 150,
             sort: false        // non serve ordinare il pool
+        });
+
+        const filterInput = document.querySelector('.consulto-pool-filter');
+
+        filterInput.addEventListener('input', function () {
+            const value = this.value.toLowerCase();
+            const items = pool.querySelectorAll('li');
+
+            items.forEach(li => {
+                const text = li.textContent.toLowerCase();
+
+                if (text.includes(value)) {
+                    li.style.display = '';
+                } else {
+                    li.style.display = 'none';
+                }
+            });
         });
 
     });

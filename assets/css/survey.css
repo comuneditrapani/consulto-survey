@@ -27,3 +27,75 @@
 .consulto-label {
     flex: 1;
 }
+
+.consulto-ranking-widget {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.consulto-ranking-pool .consulto-pool,
+.consulto-ranking-sorted {
+  padding: 0.5rem;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}
+
+.consulto-ranking-pool,
+.consulto-ranking-selected {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+  height: 400px;        /* altezza fissa */
+}
+
+/* liste */
+.consulto-list {
+  border: 1px solid #ccc;
+  min-height: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+/* elementi */
+.consulto-list li {
+  padding: 0.4rem;
+  border: 1px solid #ddd;
+  margin-bottom: 0.3rem;
+  background: #fff;
+  cursor: grab;
+}
+
+/* mobile */
+@media (max-width: 700px) {
+  .consulto-ranking-widget {
+    flex-direction: column;
+  }
+}
+
+/* input filtro */
+.consulto-pool-filter {
+  box-sizing: border-box;
+  width: 100%;
+  height: 2rem;          /* altezza fissa */
+  line-height: 1.2rem;
+  padding: 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.consulto-selected-spacer {
+    padding-top: 2rem; /* stesso spazio che l'input */
+}
+
+/* opzionale: evita resize strano su alcuni browser */
+.consulto-pool-filter {
+  flex: 0 0 auto;
+}
+
+.consulto-ranking-widget h4 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
