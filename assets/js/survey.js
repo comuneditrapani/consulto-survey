@@ -205,10 +205,11 @@ c.init.sections = function () {
 };
 
 c.init.ranking = function() {
-    // funziona sempre solo con un unico .consulto-ranking;
     const lists = document.querySelectorAll('.consulto-ranking');
 
     lists.forEach(function(el) {
+        // l'unicità della variabile c.ranking.enabled limita la
+        // funzionalità ad un unico consulto-ranking
         c.ranking.enabled = false;
         const q = el.dataset.question;
 
@@ -232,6 +233,34 @@ c.init.ranking = function() {
         }
 
         c.ranking.update(el);
+    });
+    const pools = document.querySelectorAll('.consulto-ranking-partial');
+    pools.forEach(function(el) {
+        const selected = el.querySelector('.consulto-ranking-selected');
+        const pool = el.querySelector('.consulto-ranking-pool');
+
+        // lista sinistra (ranking)
+        new Sortable(selected, {
+            group: {
+                name: 'ranking',
+                pull: true,
+                put: true
+            },
+            animation: 150,
+            sort: true
+        });
+
+        // lista destra (pool)
+        new Sortable(pool, {
+            group: {
+                name: 'ranking',
+                pull: true,
+                put: true
+            },
+            animation: 150,
+            sort: false        // non serve ordinare il pool
+        });
+
     });
 };
 
