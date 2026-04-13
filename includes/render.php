@@ -13,8 +13,20 @@
       ?? $slug;
   }
 
-  function consulto_render_survey() {
-      $survey = consulto_get_survey_definiton();
+  function consulto_render_survey($atts = []) {
+      $atts = shortcode_atts([
+          'survey' => ''
+      ], $atts);
+
+      if (empty($atts['survey'])) {
+          return '<p>Survey non specificata</p>';
+      }
+
+      $survey = consulto_get_survey_definiton($atts['survey']);
+
+      if (!$survey) {
+          return '<p>Survey non trovata</p>';
+      }
       ob_start();
 ?>
 
@@ -23,7 +35,7 @@ window.consulto = window.consulto || {}; // potrebbe venire dal JS
 window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
 </script>
 
-<form id="consulto-form" method="post">
+<form id="consulto-form" method="post" data-config="<?= esc_attr(json_encode($survey)) ?>">
   <?php wp_nonce_field('consulto_survey_submit', 'consulto_nonce'); ?>
   <input type="hidden" id="consulto-payload" name="consulto_payload" value="">
 

@@ -1,106 +1,203 @@
 <?php
-function consulto_get_survey_definiton() {
-    /* per il momento hard coded; i dati verranno dal DB.
+function consulto_get_survey_definiton($survey_slug) {
+    /* per il momento hard coded, solo poche risposte pre-programmate;
+     * a regime, i dati verranno dal DB.
      */
-    return [
-        'sections' => [
-            [
-                'slug' => 'section_profile',
-                'questions' => [
-                    [
-                        'slug' => 'question_profile_type',
-                        'type' => 'single',
-                        'options' => [
-                            ['value' => 'resident',          'slug' => 'option_resident'],
-                            ['value' => 'resident_partial',  'slug' => 'option_resident_partial'],
-                            ['value' => 'visitor',           'slug' => 'option_visitor'],
-                            ['value' => 'business',          'slug' => 'option_business'],
-                            ['value' => 'other',             'slug' => 'option_other'],
-                        ]
-                    ],
-                    [
-                        'slug' => 'question_profile_age',
-                        'type' => 'single',
-                        'options' => [
-                            ['value' => 'under_18', 'slug' => 'option_under_18'],
-                            ['value' => '18_29',    'slug' => 'option_18_29'],
-                            ['value' => '30_44',    'slug' => 'option_30_44'],
-                            ['value' => '45_65',    'slug' => 'option_45_65'],
-                            ['value' => 'over_65',  'slug' => 'option_over_65'],
-                        ]
-                    ],
-                ]
-            ],
-            [
-                'slug' => 'section_usage',
-                'questions' => [
-                    [
-                        'slug' => 'question_usage_frequency',
-                        'type' => 'single',
-                        'options' => [
-                            ['value' => 'daily',  'slug' => 'option_daily'],
-                            ['value' => 'weekly', 'slug' => 'option_weekly'],
-                        ]
-                    ],
-                    [
-                        'slug' => 'question_usage_means',
-                        'type' => 'single',
-                        'options' => [
-                            ['value' => 'car',  'slug' => 'option_car'],
-                            ['value' => 'foot', 'slug' => 'option_foot'],
-                            ['value' => 'bus',  'slug' => 'option_bus'],
-                            ['value' => 'bike', 'slug' => 'option_bike'],
-                        ]
-                    ],
-                ]
-            ],
-            [
-                'slug' => 'section_perception',
-                'questions' => [
-                    [
-                        'slug' => 'question_perception_spaces',
-                        'type' => 'scale',
-                        'min' => 1,
-                        'max' => 5
-                    ],
-                    [
-                        'slug' => 'question_perception_mobility',
-                        'type' => 'scale',
-                        'min' => 1,
-                        'max' => 5
-                    ],
-                ]
-            ],
-            [
-                'slug' => 'section_priorities',
-                'questions' => [
-                    [
-                        'slug' => 'question_priorities_ordered',
-                        'type' => 'ranking',
-                        'options' => [
-                            ['value' => 'car',        'slug' => 'option_priority_car'],
-                            ['value' => 'pedestrian', 'slug' => 'option_priority_pedestrian'],
-                            ['value' => 'cycling',    'slug' => 'option_priority_cycling'],
-                            ['value' => 'green',      'slug' => 'option_priority_green'],
-                            ['value' => 'family',     'slug' => 'option_priority_family'],
-                            ['value' => 'buses',      'slug' => 'option_priority_buses'],
-                            ['value' => 'drainage',   'slug' => 'option_priority_drainage'],
-                            ['value' => 'aesthetic',  'slug' => 'option_priority_aesthetic'],
-                        ]
-                    ],
-                    [
-                        'slug' => 'question_priorities_check',
-                        'type' => 'single',
-                        'options' => [
-                            ['value' => 'favour',  'slug' => 'option_favour'],
-                            ['value' => 'neutral', 'slug' => 'option_neutral'],
-                            ['value' => 'against', 'slug' => 'option_against'],
-                        ]
-                    ],
+    switch($survey_slug) {
+    case '5':
+        return [
+            'sections' => [
+                [
+                    'slug' => 'section_profile',
+                    'questions' => [
+                        [
+                            'slug' => 'question_profile_type',
+                            'type' => 'single',
+                            'options' => [
+                                ['value' => 'resident',          'slug' => 'option_resident'],
+                                ['value' => 'resident_partial',  'slug' => 'option_resident_partial'],
+                                ['value' => 'visitor',           'slug' => 'option_visitor'],
+                                ['value' => 'business',          'slug' => 'option_business'],
+                                ['value' => 'other',             'slug' => 'option_other'],
+                            ]
+                        ],
+                        [
+                            'slug' => 'question_profile_age',
+                            'type' => 'single',
+                            'options' => [
+                                ['value' => 'under_18', 'slug' => 'option_under_18'],
+                                ['value' => '18_29',    'slug' => 'option_18_29'],
+                                ['value' => '30_44',    'slug' => 'option_30_44'],
+                                ['value' => '45_65',    'slug' => 'option_45_65'],
+                                ['value' => 'over_65',  'slug' => 'option_over_65'],
+                            ]
+                        ],
+                    ]
+                ],
+                [
+                    'slug' => 'section_usage',
+                    'questions' => [
+                        [
+                            'slug' => 'question_usage_frequency',
+                            'type' => 'single',
+                            'options' => [
+                                ['value' => 'daily',  'slug' => 'option_daily'],
+                                ['value' => 'weekly', 'slug' => 'option_weekly'],
+                            ]
+                        ],
+                        [
+                            'slug' => 'question_usage_means',
+                            'type' => 'single',
+                            'options' => [
+                                ['value' => 'car',  'slug' => 'option_car'],
+                                ['value' => 'foot', 'slug' => 'option_foot'],
+                                ['value' => 'bus',  'slug' => 'option_bus'],
+                                ['value' => 'bike', 'slug' => 'option_bike'],
+                            ]
+                        ],
+                    ]
+                ],
+                [
+                    'slug' => 'section_perception',
+                    'questions' => [
+                        [
+                            'slug' => 'question_perception_spaces',
+                            'type' => 'scale',
+                            'min' => 1,
+                            'max' => 5
+                        ],
+                        [
+                            'slug' => 'question_perception_mobility',
+                            'type' => 'scale',
+                            'min' => 1,
+                            'max' => 5
+                        ],
+                    ]
+                ],
+                [
+                    'slug' => 'section_priorities',
+                    'questions' => [
+                        [
+                            'slug' => 'question_priorities_ordered',
+                            'type' => 'ranking',
+                            'options' => [
+                                ['value' => 'car',        'slug' => 'option_priority_car'],
+                                ['value' => 'pedestrian', 'slug' => 'option_priority_pedestrian'],
+                                ['value' => 'cycling',    'slug' => 'option_priority_cycling'],
+                                ['value' => 'green',      'slug' => 'option_priority_green'],
+                                ['value' => 'family',     'slug' => 'option_priority_family'],
+                                ['value' => 'buses',      'slug' => 'option_priority_buses'],
+                                ['value' => 'drainage',   'slug' => 'option_priority_drainage'],
+                                ['value' => 'aesthetic',  'slug' => 'option_priority_aesthetic'],
+                            ]
+                        ],
+                        [
+                            'slug' => 'question_priorities_check',
+                            'type' => 'single',
+                            'options' => [
+                                ['value' => 'favour',  'slug' => 'option_favour'],
+                                ['value' => 'neutral', 'slug' => 'option_neutral'],
+                                ['value' => 'against', 'slug' => 'option_against'],
+                            ]
+                        ],
+                    ]
                 ]
             ]
-        ]
-    ];
+        ];
+    case '42':
+        return [
+            'sections' => [
+                [
+                    'slug' => 'section_priorities',
+                    'questions' => [
+                        [
+                            'slug' => 'question_priorities_selected',
+                            'type' => 'ranking-partial',
+                            'options' => [
+                                ['value' => '0car',        'slug' => 'option_priority_car'],
+                                ['value' => '0pedestrian', 'slug' => 'option_priority_pedestrian'],
+                                ['value' => '0cycling',    'slug' => 'option_priority_cycling'],
+                                ['value' => '0green',      'slug' => 'option_priority_green'],
+                                ['value' => '0family',     'slug' => 'option_priority_family'],
+                                ['value' => '0buses',      'slug' => 'option_priority_buses'],
+                                ['value' => '0drainage',   'slug' => 'option_priority_drainage'],
+                                ['value' => '0aesthetic',  'slug' => 'option_priority_aesthetic'],
+                                ['value' => '1car',        'slug' => 'option_priority_car'],
+                                ['value' => '1pedestrian', 'slug' => 'option_priority_pedestrian'],
+                                ['value' => '1cycling',    'slug' => 'option_priority_cycling'],
+                                ['value' => '1green',      'slug' => 'option_priority_green'],
+                                ['value' => '1family',     'slug' => 'option_priority_family'],
+                                ['value' => '1buses',      'slug' => 'option_priority_buses'],
+                                ['value' => '1drainage',   'slug' => 'option_priority_drainage'],
+                                ['value' => '1aesthetic',  'slug' => 'option_priority_aesthetic'],
+                                ['value' => '2car',        'slug' => 'option_priority_car'],
+                                ['value' => '2pedestrian', 'slug' => 'option_priority_pedestrian'],
+                                ['value' => '2cycling',    'slug' => 'option_priority_cycling'],
+                                ['value' => '2green',      'slug' => 'option_priority_green'],
+                                ['value' => '2family',     'slug' => 'option_priority_family'],
+                                ['value' => '2buses',      'slug' => 'option_priority_buses'],
+                                ['value' => '2drainage',   'slug' => 'option_priority_drainage'],
+                                ['value' => '2aesthetic',  'slug' => 'option_priority_aesthetic'],
+                                ['value' => '3car',        'slug' => 'option_priority_car'],
+                                ['value' => '3pedestrian', 'slug' => 'option_priority_pedestrian'],
+                                ['value' => '3cycling',    'slug' => 'option_priority_cycling'],
+                                ['value' => '3green',      'slug' => 'option_priority_green'],
+                                ['value' => '3family',     'slug' => 'option_priority_family'],
+                                ['value' => '3buses',      'slug' => 'option_priority_buses'],
+                                ['value' => '3drainage',   'slug' => 'option_priority_drainage'],
+                                ['value' => '3aesthetic',  'slug' => 'option_priority_aesthetic'],
+                                ['value' => '4car',        'slug' => 'option_priority_car'],
+                                ['value' => '4pedestrian', 'slug' => 'option_priority_pedestrian'],
+                                ['value' => '4cycling',    'slug' => 'option_priority_cycling'],
+                                ['value' => '4green',      'slug' => 'option_priority_green'],
+                                ['value' => '4family',     'slug' => 'option_priority_family'],
+                                ['value' => '4buses',      'slug' => 'option_priority_buses'],
+                                ['value' => '4drainage',   'slug' => 'option_priority_drainage'],
+                                ['value' => '4aesthetic',  'slug' => 'option_priority_aesthetic'],
+                            ]
+                        ],
+                        [
+                            'slug' => 'question_priorities_check',
+                            'type' => 'single',
+                            'options' => [
+                                ['value' => 'favour',  'slug' => 'option_favour'],
+                                ['value' => 'neutral', 'slug' => 'option_neutral'],
+                                ['value' => 'against', 'slug' => 'option_against'],
+                            ]
+                        ],
+                    ]
+                ],
+                [
+                    'slug' => 'section_priorities',
+                    'questions' => [
+                        [
+                            'slug' => 'question_priorities_ordered',
+                            'type' => 'ranking',
+                            'options' => [
+                                ['value' => 'car',        'slug' => 'option_priority_car'],
+                                ['value' => 'pedestrian', 'slug' => 'option_priority_pedestrian'],
+                                ['value' => 'cycling',    'slug' => 'option_priority_cycling'],
+                                ['value' => 'green',      'slug' => 'option_priority_green'],
+                                ['value' => 'family',     'slug' => 'option_priority_family'],
+                                ['value' => 'buses',      'slug' => 'option_priority_buses'],
+                                ['value' => 'drainage',   'slug' => 'option_priority_drainage'],
+                                ['value' => 'aesthetic',  'slug' => 'option_priority_aesthetic'],
+                            ]
+                        ],
+                        [
+                            'slug' => 'question_priorities_check',
+                            'type' => 'single',
+                            'options' => [
+                                ['value' => 'favour',  'slug' => 'option_favour'],
+                                ['value' => 'neutral', 'slug' => 'option_neutral'],
+                                ['value' => 'against', 'slug' => 'option_against'],
+                            ]
+                        ],
+                    ]
+                ]
+            ]
+        ];
+    }
 }
 
 function consulto_get_i18n_map() {

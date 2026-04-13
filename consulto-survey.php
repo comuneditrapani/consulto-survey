@@ -32,15 +32,6 @@ add_action('wp_enqueue_scripts', function() {
         null,
         true
     );
-
-    $survey = consulto_get_survey_definiton();
-
-    wp_add_inline_script(
-        'consulto-survey-js',
-        'window.consulto = window.consulto || {}; window.consulto.config = ' . json_encode($survey) . ';',
-        'before'
-    );
-
     wp_enqueue_style(
         'consulto-survey-style',
         plugins_url('assets/css/survey.css', __FILE__)
