@@ -176,12 +176,6 @@ c.init.bindInputs = function () {
             if(c.debug) console.log('STATE:', c.answers);
         });
     });
-    const cb = document.getElementById("data-ranking-enabled");
-    if (cb) {
-        cb.addEventListener('change', () => {
-            c.ranking.enabled = cb.checked;
-        });
-    }
 };
 
 c.init.sections = function () {
@@ -201,16 +195,27 @@ c.init.ranking = function() {
 
     lists.forEach(function(el) {
         c.ranking.enabled = false;
+        const q = el.dataset.question;
+
         new Sortable(el, {
             animation: 150,
             ghostClass: 'dragging',
             onSort: function() {
                 c.ranking.enabled = true;
                 c.ranking.update(el);
-                document.getElementById("data-ranking-enabled").
+                document.getElementById(q + "-enabled").
                     checked = true;
             }
         });
+        const cb = document.getElementById(q+"-enabled");
+        console.log(q);
+        console.log(cb);
+        if (cb) {
+            cb.addEventListener('change', () => {
+                c.ranking.enabled = cb.checked;
+            });
+        }
+
         c.ranking.update(el);
     });
 };
