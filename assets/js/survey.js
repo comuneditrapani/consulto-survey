@@ -78,7 +78,6 @@ c.ranking.question = null; // il nome del ranking
 c.ranking.enabled = false; // se il ranking è confermato
 c.ranking.update = function (list) {
     const q = list.dataset.question;
-    c.ranking.question = q;
     const values = Array.from(list.querySelectorAll('li'))
           .map(li => li.dataset.value);
     c.answers[q] = values;
@@ -208,10 +207,11 @@ c.init.ranking = function() {
     const lists = document.querySelectorAll('.consulto-ranking');
 
     lists.forEach(function(el) {
-        // l'unicità della variabile c.ranking.enabled limita la
-        // funzionalità ad un unico consulto-ranking
-        c.ranking.enabled = false;
+        // le variabili c.ranking.enabled e c.ranking.question
+        // limitano la funzionalità ad un unico consulto-ranking
         const q = el.dataset.question;
+        c.ranking.enabled = false;
+        c.ranking.question = q;
 
         new Sortable(el, {
             animation: 150,
@@ -247,7 +247,10 @@ c.init.ranking = function() {
                 put: true
             },
             animation: 150,
-            sort: true
+            sort: true,
+            onSort: function() {
+                c.ranking.update(selected);
+            }
         });
 
         // lista destra (pool)

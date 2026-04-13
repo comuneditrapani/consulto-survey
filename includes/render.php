@@ -81,11 +81,11 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
       <?php
         elseif ($q['type'] === 'ranking-partial'):
         ?>
-      <div class="consulto-ranking-widget" data-question="<?= esc_attr($q['slug']) ?>">
+      <div class="consulto-ranking-widget">
         <div class="consulto-ranking-selected">
           <h4 data-i18n="ranking_selection"></h4>
           <div class="consulto-selected-spacer"></div>
-          <ul class="consulto-list consulto-selected"></ul>
+          <ul class="consulto-list consulto-selected" data-question="<?= esc_attr($q['slug']) ?>"></ul>
         </div>
         <div class="consulto-ranking-pool">
           <h4 data-i18n="ranking_pool"></h4>
