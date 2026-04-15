@@ -233,18 +233,12 @@ function consulto_get_i18n_map() {
         ],
         'option_18_29' => [
             'en' => '18 - 29',
-            'it' => '18 - 29',
-            'fr' => '18 - 29',
         ],
         'option_30_44' => [
             'en' => '30 - 44',
-            'it' => '30 - 44',
-            'fr' => '30 - 44',
         ],
         'option_45_65' => [
             'en' => '45 - 65',
-            'it' => '45 - 65',
-            'fr' => '45 - 65',
         ],
         'option_over_65' => [
             'en' => 'over 65',
@@ -291,6 +285,7 @@ function consulto_get_i18n_map() {
         ],
         'question_perception_spaces' => [
             'en' => 'Quality of public spaces (1–5):',
+            'it' => 'Qualità degli spazi pubblici (1–5):',
         ],
         'question_perception_mobility' => [
             'en' => 'Quality of urban mobility (1–5):',
@@ -311,9 +306,11 @@ function consulto_get_i18n_map() {
         ],
         'option_priority_cycling' => [
             'en' => 'Development of cycling infrastructure',
+            'it' => 'Sviluppo delle infrastrutture ciclistiche',
         ],
         'option_priority_green' => [
             'en' => 'Green areas',
+            'it' => 'Aree verdi',
         ],
         'option_priority_family' => [
             'en' => 'Services for families',
