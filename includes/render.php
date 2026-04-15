@@ -3,7 +3,8 @@
 
   function consulto_t($slug, $lang = 'it') {
       static $map = null;
-
+      // l'inizializzazione statica con chiamata a funzione è
+      // supportata solo da PHP 8.1 in poi.
       if ($map === null) {
           $map = consulto_get_i18n_map();
       }
