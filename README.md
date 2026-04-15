@@ -52,6 +52,7 @@ WordPress viene utilizzato come piattaforma di riferimento per la sua diffusione
 * non include meccanismi di autenticazione o anti-frode
 * non garantisce la partecipazione singola per utente
 * non include strumenti di analisi dei risultati (export o aggregazione avanzata non ancora implementati)
+* vedi [issues](../../issues)
 
 ## Collaborazione e riuso
 
