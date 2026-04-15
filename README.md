@@ -10,5 +10,5 @@ consulto-survey offre due tipologie di voto preferenziale:
 - nell'altro viene offerto un insieme anche molto lungo, da cui scegliere un sottoinsieme da restituire ben ordinato. gli elementi non scelti sono considerati minimali fra loro equivalenti, inferiori del minimo degli elementi scelti.
 
 ## limitazioni?
-Non c'è nessun meccanismo per l'identificazione dell'utente, quindi non c'è garanzia che ciascun utente partecipi una sola volta.
-Non ho pubblicato le bozze di programmi per l'analisi dei dati raccolti.
+- Non c'è nessun meccanismo per l'identificazione dell'utente, quindi non c'è garanzia che ciascun utente partecipi una sola volta.
+- Non ho pubblicato le bozze di programmi per l'analisi dei dati raccolti.
