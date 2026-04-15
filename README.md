@@ -57,6 +57,11 @@ WordPress viene utilizzato come piattaforma di riferimento per la sua diffusione
 
 Il progetto è pensato per il riuso nella pubblica amministrazione e per essere esteso in modo collaborativo.
 
-Colleghi di altri enti sono invitati a contribuire con miglioramenti, segnalazioni o integrazioni funzionali.
+Se utilizzi il plugin o hai esperienza in contesti simili, puoi contribuire in diversi modi:
 
+* segnalando problemi o comportamenti inattesi
+* proponendo miglioramenti funzionali o tecnici
+* suggerendo casi d’uso non ancora coperti
+* contribuendo direttamente allo sviluppo
 
+Per partecipare è sufficiente un account GitHub, nel caso non lo si abbia già.
