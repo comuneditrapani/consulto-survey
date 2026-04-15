@@ -156,15 +156,6 @@ function consulto_get_survey_definiton($survey_slug) {
                                 ['value' => '4aesthetic',  'slug' => 'option_priority_aesthetic'],
                             ]
                         ],
-                        [
-                            'slug' => 'question_priorities_check',
-                            'type' => 'single',
-                            'options' => [
-                                ['value' => 'favour',  'slug' => 'option_favour'],
-                                ['value' => 'neutral', 'slug' => 'option_neutral'],
-                                ['value' => 'against', 'slug' => 'option_against'],
-                            ]
-                        ],
                     ]
                 ],
                 [
