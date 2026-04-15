@@ -9,6 +9,9 @@ consulto-survey offre due tipologie di voto preferenziale:
 - in un tipo viene richiesto all'utente di fornire un buon ordinamento di un piccolo insieme di opzioni.
 - nell'altro viene offerto un insieme anche molto lungo, da cui scegliere un sottoinsieme da restituire ben ordinato. gli elementi non scelti sono considerati minimali fra loro equivalenti, inferiori del minimo degli elementi scelti.
 
+## no, davvero, perché questo progetto?
+L'AgID ci stimola ad usare software libero (chiamandolo Open Source) e ci facilita la scelta di WordPress. Considerate questo progetto come un invito alla cooperazione.
+
 ## limitazioni?
 - Non c'è nessun meccanismo per l'identificazione dell'utente, quindi non c'è garanzia che ciascun utente partecipi una sola volta.
 - Non ho pubblicato le bozze di programmi per l'analisi dei dati raccolti.
