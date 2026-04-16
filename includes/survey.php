@@ -1,9 +1,9 @@
 <?php
-function consulto_get_survey_definiton($survey_slug) {
+function consulto_get_survey_definiton($id) {
     /* per il momento hard coded, solo poche risposte pre-programmate;
      * a regime, i dati verranno dal DB.
      */
-    switch($survey_slug) {
+    switch($id) {
     case '5':
         return [
             'sections' => [
@@ -99,6 +99,19 @@ function consulto_get_survey_definiton($survey_slug) {
                                 ['value' => 'neutral', 'slug' => 'option_neutral'],
                                 ['value' => 'against', 'slug' => 'option_against'],
                             ]
+                        ],
+                    ]
+                ],
+[
+                    'slug' => 'section_hints',
+                    'questions' => [
+                        [
+                            'slug' => 'question_hints_top',
+                            'type' => 'text',
+                        ],
+                        [
+                            'slug' => 'question_hints_tip',
+                            'type' => 'text',
                         ],
                     ]
                 ]
