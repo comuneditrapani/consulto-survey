@@ -43,11 +43,11 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
   <?php foreach ($survey['sections'] as $i => $section): ?>
 
   <div class="consulto-section" id="section-<?= esc_attr($section['slug']) ?>">
-    <h3><?= esc_html(consulto_t($section['slug'])) ?></h3>
+    <h3><?= esc_html($section['label']) ?></h3>
     <?php foreach ($section['questions'] as $q): ?>
 
     <div class="consulto-question">
-      <p><?= esc_html(consulto_t($q['slug'])) ?></p>
+      <p><?= esc_html($q['label']) ?></p>
       <?php
         // SINGLE CHOICE
         if ($q['type'] === 'single'):
@@ -58,7 +58,7 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
                data-question="<?= esc_attr($q['slug']) ?>"
                name="<?= esc_attr($q['slug']) ?>"
                value="<?= esc_attr($opt['value']) ?>">
-        <?= esc_html(consulto_t($opt['slug'])) ?>
+        <?= esc_html($opt['label']) ?>
       </label><br>
       <?php
            endforeach;
@@ -83,7 +83,7 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
       <ul class="consulto-ranking" data-question="<?= esc_attr($q['slug']) ?>">
         <?php foreach ($q['options'] as $opt): ?>
         <li data-value="<?= esc_attr($opt['value']) ?>">
-          <?= esc_html(consulto_t($opt['slug'])) ?>
+          <?= esc_html($opt['label']) ?>
         </li>
         <?php endforeach; ?>
       </ul>
@@ -106,7 +106,7 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
           <ul class="consulto-list consulto-pool">
             <?php foreach ($q['options'] as $opt): ?>
             <li data-value="<?= esc_attr($opt['value']) ?>">
-              <?= esc_html(consulto_t($opt['slug'])) ?>
+              <?= esc_html($opt['label']) ?>
             </li>
             <?php endforeach; ?>
           </ul>
@@ -117,7 +117,7 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
       ?>
       <textarea
         data-question="<?= esc_attr($q['slug']) ?>"
-        placeholder="<?= esc_html(consulto_t($q['slug'])) ?>"
+        placeholder="<?= esc_html($q['label']) ?>"
         ></textarea>
       <?php
        endif;
