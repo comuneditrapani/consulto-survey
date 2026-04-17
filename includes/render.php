@@ -1,19 +1,6 @@
 <?php
   require_once __DIR__.'/survey.php';
 
-  function consulto_t($slug, $lang = 'it') {
-      static $map = null;
-      // l'inizializzazione statica con chiamata a funzione è
-      // supportata solo da PHP 8.1 in poi.
-      if ($map === null) {
-          $map = consulto_get_i18n_map();
-      }
-
-      return $map[$slug][$lang]
-      ?? $map[$slug]['en']
-      ?? $slug;
-  }
-
   function consulto_render_survey($atts = []) {
       $atts = shortcode_atts([
           'survey' => ''
@@ -23,7 +10,7 @@
           return '<p>Survey non specificata</p>';
       }
 
-      $survey = consulto_get_survey_definiton($atts['survey']);
+      $survey = consulto_get_survey($atts['survey']);
 
       if (!$survey) {
           return '<p>Survey non trovata</p>';

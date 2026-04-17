@@ -1,73 +1,181 @@
 <?php
-function consulto_get_survey_definiton($id) {
+
+// --- public interface -----------------------------------------
+
+function consulto_get_survey($id, $lang = 'it') {
+    $raw = consulto_get_survey_definition($id);
+
+    if (!$raw) return null;
+
+    return consulto_normalize_survey($raw, $lang);
+}
+
+// --- i18n -----------------------------------------------------
+
+function consulto_t($slug, $lang = 'it') {
+    static $map = null;
+    // l'inizializzazione statica con chiamata a funzione è
+    // supportata solo da PHP 8.1 in poi.
+    if ($map === null) {
+        $map = consulto_get_i18n_map();
+    }
+
+    return $map[$slug][$lang]
+    ?? $map[$slug]['en']
+    ?? $slug;
+}
+
+// --- normalization --------------------------------------------
+
+function consulto_normalize_entity($entity, $lang, $prefix) {
+    $id = $entity['id'] ?? null;
+    if (!$id) return null;
+
+    $slug = $entity['slug'] ?? $prefix . '_' . $id . '_missing_slug';
+
+    return [
+        'id' => $id,
+        'slug' => $slug,
+        'label' => consulto_t($slug, $lang),
+    ];
+}
+
+function consulto_normalize_survey($raw, $lang) {
+
+    $normalize_option = function($option, $lang) {
+        $base = consulto_normalize_entity($option, $lang, 'option');
+        if (!$base) return null;
+
+        return array_merge($base, [
+            'value' => $option['value'] ?? $base['slug'],
+        ]);
+    };
+
+    $normalize_question = function($question, $lang) use ($normalize_option) {
+        $base = consulto_normalize_entity($question, $lang, 'question');
+        if (!$base) return null;
+
+        $normalized = array_merge($base, [
+            'type' => $question['type'] ?? 'text',
+        ]);
+
+        if (isset($question['min'])) $normalized['min'] = $question['min'];
+        if (isset($question['max'])) $normalized['max'] = $question['max'];
+
+        // options
+        if (!empty($question['options'])) {
+            $normalized['options'] = array_values(array_filter(
+                array_map($normalize_option, $question['options'], array_fill(0, count($question['options']), $lang))
+            ));
+        }
+
+        return $normalized;
+    };
+
+    $normalize_section = function($section, $lang) use ($normalize_question) {
+        $base = consulto_normalize_entity($section, $lang, 'section');
+        if (!$base) return null;
+
+        $normalized = array_merge($base, [
+            'questions' => [],
+        ]);
+        if (!empty($section['questions'])) {
+            $normalized['questions'] = array_values(array_filter(
+                array_map($normalize_question, $section['questions'], array_fill(0, count($section['questions']), $lang))
+            ));
+        }
+
+        return $normalized;
+    };
+
+    $survey = [
+        'sections' => []
+    ];
+
+    if (!empty($raw['sections'])) {
+        $survey['sections'] = array_values(array_filter(
+            array_map($normalize_section, $raw['sections'], array_fill(0, count($raw['sections']), $lang))
+        ));
+    }
+
+    return $survey;
+}
+
+// --- raw ------------------------------------------------------
+
+function consulto_get_survey_definition($id) {
     /* per il momento hard coded, solo poche risposte pre-programmate;
      * a regime, i dati verranno dal DB.
+     *
+     * i dati restituiti da questa funzione, o recuperati dalla base
+     * dati, sono da considerare "crudi" e vanno normalizzati,
      */
     switch($id) {
     case '5':
         return [
+            'id' => 1,
             'sections' => [
                 [
-                    'slug' => 'section_profile',
+                    'id' => 2, 'slug' => 'section_profile',
                     'questions' => [
                         [
-                            'slug' => 'question_profile_type',
+                            'id' => 3, 'slug' => 'question_profile_type',
                             'type' => 'single',
                             'options' => [
-                                ['value' => 'resident',          'slug' => 'option_resident'],
-                                ['value' => 'resident_partial',  'slug' => 'option_resident_partial'],
-                                ['value' => 'visitor',           'slug' => 'option_visitor'],
-                                ['value' => 'business',          'slug' => 'option_business'],
-                                ['value' => 'other',             'slug' => 'option_other'],
+                                ['value' => 'resident',          'id'=>4, 'slug' => 'option_resident'],
+                                ['value' => 'resident_partial',  'id'=>5, 'slug' => 'option_resident_partial'],
+                                ['value' => 'visitor',           'id'=>6, 'slug' => 'option_visitor'],
+                                ['value' => 'business',          'id'=>7, 'slug' => 'option_business'],
+                                ['value' => 'other',             'id'=>8, 'slug' => 'option_other'],
                             ]
                         ],
                         [
-                            'slug' => 'question_profile_age',
+                            'id'=>9, 'slug' => 'question_profile_age',
                             'type' => 'single',
                             'options' => [
-                                ['value' => 'under_18', 'slug' => 'option_under_18'],
-                                ['value' => '18_29',    'slug' => 'option_18_29'],
-                                ['value' => '30_44',    'slug' => 'option_30_44'],
-                                ['value' => '45_65',    'slug' => 'option_45_65'],
-                                ['value' => 'over_65',  'slug' => 'option_over_65'],
+                                ['value' => 'under_18', 'id'=>10, 'slug' => 'option_under_18'],
+                                ['value' => '18_29',    'id'=>11, 'slug' => 'option_18_29'],
+                                ['value' => '30_44',    'id'=>12, 'slug' => 'option_30_44'],
+                                ['value' => '45_65',    'id'=>13, 'slug' => 'option_45_65'],
+                                ['value' => 'over_65',  'id'=>14, 'slug' => 'option_over_65'],
                             ]
                         ],
                     ]
                 ],
                 [
-                    'slug' => 'section_usage',
+                    'id'=>15, 'slug' => 'section_usage',
                     'questions' => [
                         [
-                            'slug' => 'question_usage_frequency',
+                            'id'=>16, 'slug' => 'question_usage_frequency',
                             'type' => 'single',
                             'options' => [
-                                ['value' => 'daily',  'slug' => 'option_daily'],
-                                ['value' => 'weekly', 'slug' => 'option_weekly'],
+                                ['value' => 'daily',  'id'=>17, 'slug' => 'option_daily'],
+                                ['value' => 'weekly', 'id'=>18, 'slug' => 'option_weekly'],
                             ]
                         ],
                         [
-                            'slug' => 'question_usage_means',
+                            'id'=>19, 'slug' => 'question_usage_means',
                             'type' => 'single',
                             'options' => [
-                                ['value' => 'car',  'slug' => 'option_car'],
-                                ['value' => 'foot', 'slug' => 'option_foot'],
-                                ['value' => 'bus',  'slug' => 'option_bus'],
-                                ['value' => 'bike', 'slug' => 'option_bike'],
+                                ['value' => 'car',  'id'=>20, 'slug' => 'option_car'],
+                                ['value' => 'foot', 'id'=>21, 'slug' => 'option_foot'],
+                                ['value' => 'bus',  'id'=>22, 'slug' => 'option_bus'],
+                                ['value' => 'bike', 'id'=>23, 'slug' => 'option_bike'],
                             ]
                         ],
                     ]
                 ],
                 [
-                    'slug' => 'section_perception',
+                    'id'=>24, 'slug' => 'section_perception',
                     'questions' => [
                         [
-                            'slug' => 'question_perception_spaces',
+                            'id'=>25, 'slug' => 'question_perception_spaces',
                             'type' => 'scale',
                             'min' => 1,
                             'max' => 5
                         ],
                         [
-                            'slug' => 'question_perception_mobility',
+                            'id'=>26, 'slug' => 'question_perception_mobility',
                             'type' => 'scale',
                             'min' => 1,
                             'max' => 5
@@ -75,42 +183,42 @@ function consulto_get_survey_definiton($id) {
                     ]
                 ],
                 [
-                    'slug' => 'section_priorities',
+                    'id'=>27, 'slug' => 'section_priorities',
                     'questions' => [
                         [
-                            'slug' => 'question_priorities_ordered',
+                            'id'=>28, 'slug' => 'question_priorities_ordered',
                             'type' => 'ranking',
                             'options' => [
-                                ['value' => 'car',        'slug' => 'option_priority_car'],
-                                ['value' => 'pedestrian', 'slug' => 'option_priority_pedestrian'],
-                                ['value' => 'cycling',    'slug' => 'option_priority_cycling'],
-                                ['value' => 'green',      'slug' => 'option_priority_green'],
-                                ['value' => 'family',     'slug' => 'option_priority_family'],
-                                ['value' => 'buses',      'slug' => 'option_priority_buses'],
-                                ['value' => 'drainage',   'slug' => 'option_priority_drainage'],
-                                ['value' => 'aesthetic',  'slug' => 'option_priority_aesthetic'],
+                                ['value' => 'car',        'id'=>29, 'slug' => 'option_priority_car'],
+                                ['value' => 'pedestrian', 'id'=>30, 'slug' => 'option_priority_pedestrian'],
+                                ['value' => 'cycling',    'id'=>31, 'slug' => 'option_priority_cycling'],
+                                ['value' => 'green',      'id'=>32, 'slug' => 'option_priority_green'],
+                                ['value' => 'family',     'id'=>33, 'slug' => 'option_priority_family'],
+                                ['value' => 'buses',      'id'=>34, 'slug' => 'option_priority_buses'],
+                                ['value' => 'drainage',   'id'=>35, 'slug' => 'option_priority_drainage'],
+                                ['value' => 'aesthetic',  'id'=>36, 'slug' => 'option_priority_aesthetic'],
                             ]
                         ],
                         [
-                            'slug' => 'question_priorities_check',
+                            'id'=>37, 'slug' => 'question_priorities_check',
                             'type' => 'single',
                             'options' => [
-                                ['value' => 'favour',  'slug' => 'option_favour'],
-                                ['value' => 'neutral', 'slug' => 'option_neutral'],
-                                ['value' => 'against', 'slug' => 'option_against'],
+                                ['value' => 'favour',  'id'=>38, 'slug' => 'option_favour'],
+                                ['value' => 'neutral', 'id'=>39, 'slug' => 'option_neutral'],
+                                ['value' => 'against', 'id'=>40, 'slug' => 'option_against'],
                             ]
                         ],
                     ]
                 ],
 [
-                    'slug' => 'section_hints',
+                    'id'=>41, 'slug' => 'section_hints',
                     'questions' => [
                         [
-                            'slug' => 'question_hints_top',
+                            'id'=>42, 'slug' => 'question_hints_top',
                             'type' => 'text',
                         ],
                         [
-                            'slug' => 'question_hints_tip',
+                            'id'=>43, 'slug' => 'question_hints_tip',
                             'type' => 'text',
                         ],
                     ]
@@ -121,79 +229,79 @@ function consulto_get_survey_definiton($id) {
         return [
             'sections' => [
                 [
-                    'slug' => 'section_projects',
+                    'id'=>44, 'slug' => 'section_projects',
                     'questions' => [
                         [
-                            'slug' => 'question_projects_selected',
+                            'id'=>45, 'slug' => 'question_projects_selected',
                             'type' => 'ranking-partial',
                             'options' => [
-                                ['value' => 'urban_mobility_plan',        'slug' => 'option_project_urban_mobility_plan'],
-                                ['value' => 'pedestrian_zone_expansion',        'slug' => 'option_project_pedestrian_zone_expansion'],
-                                ['value' => 'bicycle_network_upgrade',        'slug' => 'option_project_bicycle_network_upgrade'],
-                                ['value' => 'public_transport_study',        'slug' => 'option_project_public_transport_study'],
-                                ['value' => 'smart_traffic_system',        'slug' => 'option_project_smart_traffic_system'],
-                                ['value' => 'parking_reform',        'slug' => 'option_project_parking_reform'],
-                                ['value' => 'low_emission_zone',        'slug' => 'option_project_low_emission_zone'],
-                                ['value' => 'center_accessibility',        'slug' => 'option_project_center_accessibility'],
-                                ['value' => 'level_crossing_improvement',        'slug' => 'option_project_level_crossing_improvement'],
-                                ['value' => 'waterfront_redevelopment',        'slug' => 'option_project_waterfront_redevelopment'],
-                                ['value' => 'park_renovation',        'slug' => 'option_project_park_renovation'],
-                                ['value' => 'urban_tree_planting',        'slug' => 'option_project_urban_tree_planting'],
-                                ['value' => 'square_redesign',        'slug' => 'option_project_square_redesign'],
-                                ['value' => 'playground_safety',        'slug' => 'option_project_playground_safety'],
-                                ['value' => 'heat_island_mitigation',        'slug' => 'option_project_heat_island_mitigation'],
-                                ['value' => 'stream_deconcretization',        'slug' => 'option_project_stream_deconcretization'],
-                                ['value' => 'coastal_protection',        'slug' => 'option_project_coastal_protection'],
-                                ['value' => 'stormwater_management',        'slug' => 'option_project_stormwater_management'],
-                                ['value' => 'road_maintenance',        'slug' => 'option_project_road_maintenance'],
-                                ['value' => 'tunnel_safety_upgrade',        'slug' => 'option_project_tunnel_safety_upgrade'],
-                                ['value' => 'building_energy_retrofit',        'slug' => 'option_project_building_energy_retrofit'],
-                                ['value' => 'municipal_solar_installation',        'slug' => 'option_project_municipal_solar_installation'],
-                                ['value' => 'smart_city_sensors',        'slug' => 'option_project_smart_city_sensors'],
-                                ['value' => 'digital_services_platform',        'slug' => 'option_project_digital_services_platform'],
-                                ['value' => 'public_wifi_expansion',        'slug' => 'option_project_public_wifi_expansion'],
-                                ['value' => 'transparency_portal',        'slug' => 'option_project_transparency_portal'],
-                                ['value' => 'waste_optimization',        'slug' => 'option_project_waste_optimization'],
-                                ['value' => 'recycling_expansion',        'slug' => 'option_project_recycling_expansion'],
-                                ['value' => 'social_housing_renovation',        'slug' => 'option_project_social_housing_renovation'],
-                                ['value' => 'affordable_housing_plan',        'slug' => 'option_project_affordable_housing_plan'],
-                                ['value' => 'school_modernization',        'slug' => 'option_project_school_modernization'],
-                                ['value' => 'library_digitalization',        'slug' => 'option_project_library_digitalization'],
-                                ['value' => 'youth_center_expansion',        'slug' => 'option_project_youth_center_expansion'],
-                                ['value' => 'elderly_care_services',        'slug' => 'option_project_elderly_care_services'],
-                                ['value' => 'public_health_campaign',        'slug' => 'option_project_public_health_campaign'],
-                                ['value' => 'community_center_network',        'slug' => 'option_project_community_center_network'],
-                                ['value' => 'museum_expansion',        'slug' => 'option_project_museum_expansion'],
-                                ['value' => 'tourism_promotion',        'slug' => 'option_project_tourism_promotion'],
-                                ['value' => 'beach_sanitation_coastal_management',        'slug' => 'option_project_beach_sanitation_coastal_management'],
+                                ['value' => 'urban_mobility_plan',       'id'=>46, 'slug' => 'option_project_urban_mobility_plan'],
+                                ['value' => 'pedestrian_zone_expansion', 'id'=>47, 'slug' => 'option_project_pedestrian_zone_expansion'],
+                                ['value' => 'bicycle_network_upgrade',   'id'=>48, 'slug' => 'option_project_bicycle_network_upgrade'],
+                                ['value' => 'public_transport_study',    'id'=>49, 'slug' => 'option_project_public_transport_study'],
+                                ['value' => 'smart_traffic_system',      'id'=>50, 'slug' => 'option_project_smart_traffic_system'],
+                                ['value' => 'parking_reform',            'id'=>51, 'slug' => 'option_project_parking_reform'],
+                                ['value' => 'low_emission_zone',         'id'=>52, 'slug' => 'option_project_low_emission_zone'],
+                                ['value' => 'center_accessibility',      'id'=>53, 'slug' => 'option_project_center_accessibility'],
+                                ['value' => 'level_crossing_improvement','id'=>54, 'slug' => 'option_project_level_crossing_improvement'],
+                                ['value' => 'waterfront_redevelopment',  'id'=>55, 'slug' => 'option_project_waterfront_redevelopment'],
+                                ['value' => 'park_renovation',           'id'=>56, 'slug' => 'option_project_park_renovation'],
+                                ['value' => 'urban_tree_planting',       'id'=>57, 'slug' => 'option_project_urban_tree_planting'],
+                                ['value' => 'square_redesign',           'id'=>58, 'slug' => 'option_project_square_redesign'],
+                                ['value' => 'playground_safety',         'id'=>59, 'slug' => 'option_project_playground_safety'],
+                                ['value' => 'heat_island_mitigation',    'id'=>60, 'slug' => 'option_project_heat_island_mitigation'],
+                                ['value' => 'stream_deconcretization',   'id'=>61, 'slug' => 'option_project_stream_deconcretization'],
+                                ['value' => 'coastal_protection',        'id'=>62, 'slug' => 'option_project_coastal_protection'],
+                                ['value' => 'stormwater_management',     'id'=>63, 'slug' => 'option_project_stormwater_management'],
+                                ['value' => 'road_maintenance',          'id'=>64, 'slug' => 'option_project_road_maintenance'],
+                                ['value' => 'tunnel_safety_upgrade',     'id'=>65, 'slug' => 'option_project_tunnel_safety_upgrade'],
+                                ['value' => 'building_energy_retrofit',  'id'=>66, 'slug' => 'option_project_building_energy_retrofit'],
+                                ['value' => 'municipal_solar_installation','id'=>67, 'slug' => 'option_project_municipal_solar_installation'],
+                                ['value' => 'smart_city_sensors',        'id'=>68, 'slug' => 'option_project_smart_city_sensors'],
+                                ['value' => 'digital_services_platform', 'id'=>69, 'slug' => 'option_project_digital_services_platform'],
+                                ['value' => 'public_wifi_expansion',     'id'=>70, 'slug' => 'option_project_public_wifi_expansion'],
+                                ['value' => 'transparency_portal',       'id'=>71, 'slug' => 'option_project_transparency_portal'],
+                                ['value' => 'waste_optimization',        'id'=>72, 'slug' => 'option_project_waste_optimization'],
+                                ['value' => 'recycling_expansion',       'id'=>73, 'slug' => 'option_project_recycling_expansion'],
+                                ['value' => 'social_housing_renovation', 'id'=>74, 'slug' => 'option_project_social_housing_renovation'],
+                                ['value' => 'affordable_housing_plan',   'id'=>75, 'slug' => 'option_project_affordable_housing_plan'],
+                                ['value' => 'school_modernization',      'id'=>76, 'slug' => 'option_project_school_modernization'],
+                                ['value' => 'library_digitalization',    'id'=>77, 'slug' => 'option_project_library_digitalization'],
+                                ['value' => 'youth_center_expansion',    'id'=>78, 'slug' => 'option_project_youth_center_expansion'],
+                                ['value' => 'elderly_care_services',     'id'=>79, 'slug' => 'option_project_elderly_care_services'],
+                                ['value' => 'public_health_campaign',    'id'=>80, 'slug' => 'option_project_public_health_campaign'],
+                                ['value' => 'community_center_network',  'id'=>81, 'slug' => 'option_project_community_center_network'],
+                                ['value' => 'museum_expansion',          'id'=>82, 'slug' => 'option_project_museum_expansion'],
+                                ['value' => 'tourism_promotion',         'id'=>83, 'slug' => 'option_project_tourism_promotion'],
+                                ['value' => 'beach_sanitation',          'id'=>84, 'slug' => 'option_project_beach_sanitation'],
                             ]
                         ],
                     ]
                 ],
                 [
-                    'slug' => 'section_priorities',
+                    'id'=>85, 'slug' => 'section_priorities',
                     'questions' => [
                         [
-                            'slug' => 'question_priorities_ordered',
+                            'id'=>86, 'slug' => 'question_priorities_ordered',
                             'type' => 'ranking',
                             'options' => [
-                                ['value' => 'car',        'slug' => 'option_priority_car'],
-                                ['value' => 'pedestrian', 'slug' => 'option_priority_pedestrian'],
-                                ['value' => 'cycling',    'slug' => 'option_priority_cycling'],
-                                ['value' => 'green',      'slug' => 'option_priority_green'],
-                                ['value' => 'family',     'slug' => 'option_priority_family'],
-                                ['value' => 'buses',      'slug' => 'option_priority_buses'],
-                                ['value' => 'drainage',   'slug' => 'option_priority_drainage'],
-                                ['value' => 'aesthetic',  'slug' => 'option_priority_aesthetic'],
+                                ['value' => 'car',        'id'=>87, 'slug' => 'option_priority_car'],
+                                ['value' => 'pedestrian', 'id'=>88, 'slug' => 'option_priority_pedestrian'],
+                                ['value' => 'cycling',    'id'=>89, 'slug' => 'option_priority_cycling'],
+                                ['value' => 'green',      'id'=>90, 'slug' => 'option_priority_green'],
+                                ['value' => 'family',     'id'=>91, 'slug' => 'option_priority_family'],
+                                ['value' => 'buses',      'id'=>92, 'slug' => 'option_priority_buses'],
+                                ['value' => 'drainage',   'id'=>93, 'slug' => 'option_priority_drainage'],
+                                ['value' => 'aesthetic',  'id'=>94, 'slug' => 'option_priority_aesthetic'],
                             ]
                         ],
                         [
-                            'slug' => 'question_priorities_check',
+                            'id'=>95, 'slug' => 'question_priorities_check',
                             'type' => 'single',
                             'options' => [
-                                ['value' => 'favour',  'slug' => 'option_favour'],
-                                ['value' => 'neutral', 'slug' => 'option_neutral'],
-                                ['value' => 'against', 'slug' => 'option_against'],
+                                ['value' => 'favour',  'id'=>96, 'slug' => 'option_favour'],
+                                ['value' => 'neutral', 'id'=>97, 'slug' => 'option_neutral'],
+                                ['value' => 'against', 'id'=>98, 'slug' => 'option_against'],
                             ]
                         ],
                     ]
@@ -425,7 +533,7 @@ function consulto_get_i18n_map() {
   'fr' => 'Promotion du tourisme',
   'de' => 'Tourismusförderung',
 ],
-'option_project_beach_sanitation_coastal_management' => [
+'option_project_beach_sanitation' => [
   'it' => 'Igiene e gestione ambientale delle spiagge e delle aree costiere',
   'en' => 'Beach sanitation and coastal ecosystem management',
   'fr' => 'Assainissement des plages et gestion côtière',
