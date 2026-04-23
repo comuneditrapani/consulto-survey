@@ -43,3 +43,39 @@ add_action('wp_enqueue_scripts', function() {
 });
 
 register_activation_hook(__FILE__, 'consulto_create_tables');
+
+// --- interfaccia definizione survey -----------------------------
+
+if (!defined('ABSPATH')) exit;
+
+add_action('edit_form_after_title', function ($post) {
+    if($post->post_type !== 'consulto_survey') {
+        return;
+    }
+    echo '<div id="consulto-survey-root" data-post-id="'.esc_attr($post->ID).'"></div>';
+});
+
+add_action('admin_init', function () {
+    remove_post_type_support('consulto_survey', 'editor');
+});
+
+add_action('admin_enqueue_scripts', function ($hook) {
+
+    global $post;
+    if(!$post || $post->post_type !== 'consulto_survey') {
+        return;
+    }
+
+    wp_enqueue_script(
+        'consulto-survey-admin',
+        plugin_dir_url(__FILE__) . 'build/admin.js',
+        ['wp-element'],
+        filemtime(__DIR__ . '/build/admin.js'),
+        true
+    );
+
+    wp_localize_script('consulto-survey-admin', 'ConsultoAPI', [
+        'restUrl' => esc_url_raw(rest_url('consulto/v1')),
+        'nonce'   => wp_create_nonce('wp_rest')
+    ]);
+});

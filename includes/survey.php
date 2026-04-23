@@ -192,6 +192,12 @@ function consulto_get_i18n_map() {
 
 // --- rest api i18n --------------------------------------------
 
+function consulto_rest_api_init () {
+    consulto_register_autocomplete_routes();
+    consulto_register_survey_routes();
+    // consulto_register_whatever_routes();
+}
+
 function consulto_rebuild_i18n_flat_cache() {
     $raw = get_option('consulto_i18n_map', '{}');
     $map = json_decode($raw, true) ?: [];
@@ -297,7 +303,7 @@ function consulto_autocomplete_handler(WP_REST_Request $request) {
     return rest_ensure_response($results);
 }
 
-function consulto_rest_api_init () {
+function consulto_register_autocomplete_routes() {
     register_rest_route('consulto/v1', '/autocomplete', [
         'methods'  => 'GET',
         'callback' => 'consulto_autocomplete_handler',
@@ -305,5 +311,43 @@ function consulto_rest_api_init () {
         // 'permission_callback' => function () {
         //     return current_user_can('edit_posts');
         // }
+    ]);
+}
+
+function consulto_register_survey_routes() {
+    register_rest_route('consulto/v1', '/survey/(?P<id>\d+)', [
+        [
+            'methods'  => 'GET',
+            'callback' => function ($request) {
+                $post_id = (int) $request['id'];
+                $schema = get_post_meta($post_id, '_consulto_survey_schema', true);
+                if (!$schema) {
+                    return [
+                        'title' => '',
+                        'sections' => []
+                    ];
+                }
+                return json_decode($schema, true);
+            },
+            'permission_callback' => function () {
+                return current_user_can('edit_posts');
+            }
+        ],
+        [
+            'methods'  => 'POST',
+            'callback' => function ($request) {
+                $post_id = (int) $request['id'];
+                $data = $request->get_json_params();
+                update_post_meta(
+                    $post_id,
+                    '_consulto_survey_schema',
+                    wp_json_encode($data)
+                );
+                return ['ok' => true];
+            },
+            'permission_callback' => function () {
+                return current_user_can('edit_posts');
+            }
+        ]
     ]);
 }

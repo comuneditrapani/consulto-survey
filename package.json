@@ -1,0 +1,34 @@
+{
+  "name": "consulto-survey",
+  "description": "Plugin WordPress per la gestione di sondaggi con supporto a **voto preferenziale (ranking / partial ranking)**, progettato per contesti della pubblica amministrazione.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.2",
+    "@babel/preset-react": "^7.28.5",
+    "babel-loader": "^10.1.1",
+    "webpack": "^5.106.2",
+    "webpack-cli": "^7.0.2"
+  },
+  "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "build": "webpack",
+      "watch": "webpack --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/comuneditrapani/consulto-survey.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/comuneditrapani/consulto-survey/issues"
+  },
+  "homepage": "https://github.com/comuneditrapani/consulto-survey#readme"
+}
