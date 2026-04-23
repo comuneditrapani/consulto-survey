@@ -2,16 +2,19 @@ import React, { useRef, useEffect } from "react";
 import Question from "./Question";
 
 export default function Section({ section, autoFocus, onChange }) {
+    const focusQuestionId = useRef(null);
     const update = (patch) => {
         onChange({ ...section, ...patch });
     };
 
     const addQuestion = () => {
+        const id = crypto.randomUUID();
+        focusQuestionId.current = id;
         update({
             questions: [
                 ...section.questions,
                 {
-                    id: crypto.randomUUID(),
+                    id,
                     type: "text",
                     slug: "",
                     options: [],
@@ -48,6 +51,7 @@ export default function Section({ section, autoFocus, onChange }) {
                 <Question
                     key={q.id}
                     question={q}
+                    autoFocus={focusQuestionId.current === q.id}
                     onChange={(updated) => {
                         const questions = [...section.questions];
                         questions[i] = updated;

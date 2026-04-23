@@ -210,7 +210,15 @@ function renderByType(question, update) {
 }
 function Question(_ref2) {
   var question = _ref2.question,
+    autoFocus = _ref2.autoFocus,
     onChange = _ref2.onChange;
+  var slugRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    if (autoFocus && slugRef.current) {
+      slugRef.current.focus();
+      slugRef.current.select();
+    }
+  }, [autoFocus]);
   var update = function update(patch) {
     onChange(_objectSpread(_objectSpread({}, question), patch));
   };
@@ -239,8 +247,9 @@ function Question(_ref2) {
   }, "ranking"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("option", {
     value: "ranking-partial"
   }, "ranking-partial")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    ref: slugRef,
     placeholder: "Question slug",
-    value: question.slug,
+    value: question.slug || "",
     onChange: function onChange(e) {
       return update({
         slug: e.target.value
@@ -286,13 +295,16 @@ function Section(_ref) {
   var section = _ref.section,
     autoFocus = _ref.autoFocus,
     onChange = _ref.onChange;
+  var focusQuestionId = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   var update = function update(patch) {
     onChange(_objectSpread(_objectSpread({}, section), patch));
   };
   var addQuestion = function addQuestion() {
+    var id = crypto.randomUUID();
+    focusQuestionId.current = id;
     update({
       questions: [].concat(_toConsumableArray(section.questions), [{
-        id: crypto.randomUUID(),
+        id: id,
         type: "text",
         slug: "",
         options: [],
@@ -329,6 +341,7 @@ function Section(_ref) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Question__WEBPACK_IMPORTED_MODULE_1__["default"], {
       key: q.id,
       question: q,
+      autoFocus: focusQuestionId.current === q.id,
       onChange: function onChange(updated) {
         var questions = _toConsumableArray(section.questions);
         questions[i] = updated;

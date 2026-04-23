@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useRef} from "react";
 
 export function OptionsEditor({ question, onChange }) {
     const update = (patch) => {
@@ -75,7 +75,14 @@ function renderByType(question, update) {
     }
 }
 
-export default function Question({ question, onChange }) {
+export default function Question({ question, autoFocus, onChange }) {
+    const slugRef = useRef(null);
+    useEffect(() => {
+        if(autoFocus && slugRef.current) {
+            slugRef.current.focus();
+            slugRef.current.select();
+        }
+    }, [autoFocus]);
     const update = (patch) => {
         onChange({ ...question, ...patch });
     };
@@ -94,8 +101,9 @@ export default function Question({ question, onChange }) {
                 <option value="ranking-partial">ranking-partial</option>
             </select>
             <input
+                ref={slugRef}
                 placeholder="Question slug"
-                value={question.slug}
+                value={question.slug || ""}
                 onChange={(e) => update({ slug: e.target.value})}
             />
             <div style={{ marginTop: 8 }}>
