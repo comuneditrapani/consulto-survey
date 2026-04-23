@@ -2,11 +2,13 @@
 
 // --- public interface -----------------------------------------
 
-function consulto_get_survey($id, $lang = 'it') {
-    $raw = consulto_get_survey_definition($id);
-
+/**
+  return the complete normalized survey, given its name
+ */
+function consulto_get_survey($survey_name, $lang = 'it') {
+    $survey_id = consulto_get_survey_id($survey_name);
+    $raw = consulto_get_raw_survey($survey_id);
     if (!$raw) return null;
-
     return consulto_normalize_survey($raw, $lang);
 }
 
@@ -152,10 +154,10 @@ function consulto_normalize_survey($raw, $lang) {
 
 // --- raw ------------------------------------------------------
 
-function consulto_get_survey_definition($name) {
-    /* i dati restituiti da questa funzione, sono da considerare
-     * "crudi" e vanno normalizzati, vedi consulto_normalize_survey
-     */
+/**
+  return the survey id given its name
+*/
+function consulto_get_survey_id($name) {
     $posts = get_posts(array(
         'name' => $name,
         'post_type' => 'consulto_survey',
@@ -164,7 +166,17 @@ function consulto_get_survey_definition($name) {
     if(empty($posts)) {
         return null;
     }
-    $raw = get_post_meta($posts[0]->ID, '_consulto_survey_schema', true);
+    return $posts[0]->ID;
+}
+
+/**
+  return complete raw survey data, given its id
+*/
+function consulto_get_raw_survey($survey_id) {
+    /* i dati restituiti da questa funzione, sono da considerare
+     * "crudi" e vanno normalizzati, vedi consulto_normalize_survey
+     */
+    $raw = get_post_meta($survey_id, '_consulto_survey_schema', true);
     $survey = json_decode($raw, true) ?: [];
     return $survey;
 }
