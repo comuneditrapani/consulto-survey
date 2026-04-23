@@ -90,7 +90,6 @@ function consulto_normalize_entity($entity, $lang, $prefix) {
 }
 
 function consulto_normalize_survey($raw, $lang) {
-
     $normalize_option = function($option, $lang) {
         $base = consulto_normalize_entity($option, $lang, 'option');
         if (!$base) return null;
@@ -152,211 +151,21 @@ function consulto_normalize_survey($raw, $lang) {
 
 // --- raw ------------------------------------------------------
 
-function consulto_get_survey_definition($id) {
-    /* per il momento hard coded, solo poche risposte pre-programmate;
-     * a regime, i dati verranno dal DB.
-     *
-     * i dati restituiti da questa funzione, o recuperati dalla base
-     * dati, sono da considerare "crudi" e vanno normalizzati,
+function consulto_get_survey_definition($name) {
+    /* i dati restituiti da questa funzione, sono da considerare
+     * "crudi" e vanno normalizzati, vedi consulto_normalize_survey
      */
-    static $surveys = [
-        '5' => [
-            'id' => 1,
-            'sections' => [
-                [
-                    'id' => 2, 'slug' => 'section_profile',
-                    'questions' => [
-                        [
-                            'id' => 3, 'slug' => 'question_profile_type',
-                            'type' => 'single',
-                            'options' => [
-                                ['value' => 'resident', 'id'=>4, 'slug' => 'option_resident'],
-                                ['value' => 'resident_partial', 'id'=>5, 'slug' => 'option_resident_partial'],
-                                ['value' => 'visitor', 'id'=>6, 'slug' => 'option_visitor'],
-                                ['value' => 'business', 'id'=>7, 'slug' => 'option_business'],
-                                ['value' => 'other', 'id'=>8, 'slug' => 'option_other'],
-                            ]
-                        ],
-                        [
-                            'id'=>9, 'slug' => 'question_profile_age',
-                            'type' => 'single',
-                            'options' => [
-                                ['value' => 'under_18', 'id'=>10, 'slug' => 'option_under_18'],
-                                ['value' => '18_29', 'id'=>11, 'slug' => 'option_18_29'],
-                                ['value' => '30_44', 'id'=>12, 'slug' => 'option_30_44'],
-                                ['value' => '45_65', 'id'=>13, 'slug' => 'option_45_65'],
-                                ['value' => 'over_65', 'id'=>14, 'slug' => 'option_over_65'],
-                            ]
-                        ],
-                    ]
-                ],
-                [
-                    'id'=>15, 'slug' => 'section_usage',
-                    'questions' => [
-                        [
-                            'id'=>16, 'slug' => 'question_usage_frequency',
-                            'type' => 'single',
-                            'options' => [
-                                ['value' => 'daily', 'id'=>17, 'slug' => 'option_daily'],
-                                ['value' => 'weekly', 'id'=>18, 'slug' => 'option_weekly'],
-                            ]
-                        ],
-                        [
-                            'id'=>19, 'slug' => 'question_usage_means',
-                            'type' => 'single',
-                            'options' => [
-                                ['value' => 'car', 'id'=>20, 'slug' => 'option_car'],
-                                ['value' => 'foot', 'id'=>21, 'slug' => 'option_foot'],
-                                ['value' => 'bus', 'id'=>22, 'slug' => 'option_bus'],
-                                ['value' => 'bike', 'id'=>23, 'slug' => 'option_bike'],
-                            ]
-                        ],
-                    ]
-                ],
-                [
-                    'id'=>24, 'slug' => 'section_perception',
-                    'questions' => [
-                        [
-                            'id'=>25, 'slug' => 'question_perception_spaces',
-                            'type' => 'scale',
-                            'min' => 1,
-                            'max' => 5
-                        ],
-                        [
-                            'id'=>26, 'slug' => 'question_perception_mobility',
-                            'type' => 'scale',
-                            'min' => 1,
-                            'max' => 5
-                        ],
-                    ]
-                ],
-                [
-                    'id'=>27, 'slug' => 'section_priorities',
-                    'questions' => [
-                        [
-                            'id'=>28, 'slug' => 'question_priorities_ordered',
-                            'type' => 'ranking',
-                            'options' => [
-                                ['value' => 'car', 'id'=>29, 'slug' => 'option_priority_car'],
-                                ['value' => 'pedestrian', 'id'=>30, 'slug' => 'option_priority_pedestrian'],
-                                ['value' => 'cycling', 'id'=>31, 'slug' => 'option_priority_cycling'],
-                                ['value' => 'green', 'id'=>32, 'slug' => 'option_priority_green'],
-                                ['value' => 'family', 'id'=>33, 'slug' => 'option_priority_family'],
-                                ['value' => 'buses', 'id'=>34, 'slug' => 'option_priority_buses'],
-                                ['value' => 'drainage', 'id'=>35, 'slug' => 'option_priority_drainage'],
-                                ['value' => 'aesthetic', 'id'=>36, 'slug' => 'option_priority_aesthetic'],
-                            ]
-                        ],
-                        [
-                            'id'=>37, 'slug' => 'question_priorities_check',
-                            'type' => 'single',
-                            'options' => [
-                                ['value' => 'favour', 'id'=>38, 'slug' => 'option_favour'],
-                                ['value' => 'neutral', 'id'=>39, 'slug' => 'option_neutral'],
-                                ['value' => 'against', 'id'=>40, 'slug' => 'option_against'],
-                            ]
-                        ],
-                    ]
-                ],
-                [
-                    'id'=>41, 'slug' => 'section_hints',
-                    'questions' => [
-                        [
-                            'id'=>42, 'slug' => 'question_hints_top',
-                            'type' => 'text',
-                        ],
-                        [
-                            'id'=>43, 'slug' => 'question_hints_tip',
-                            'type' => 'text',
-                        ],
-                    ]
-                ]
-            ]
-        ],
-        '42' => [
-            'sections' => [
-                [
-                    'id'=>44, 'slug' => 'section_projects',
-                    'questions' => [
-                        [
-                            'id'=>45, 'slug' => 'question_projects_selected',
-                            'type' => 'ranking-partial',
-                            'options' => [
-                                ['value' => 'urban_mobility_plan', 'id'=>46, 'slug' => 'option_project_urban_mobility_plan'],
-                                ['value' => 'pedestrian_zone_expansion', 'id'=>47, 'slug' => 'option_project_pedestrian_zone_expansion'],
-                                ['value' => 'bicycle_network_upgrade', 'id'=>48, 'slug' => 'option_project_bicycle_network_upgrade'],
-                                ['value' => 'public_transport_study', 'id'=>49, 'slug' => 'option_project_public_transport_study'],
-                                ['value' => 'smart_traffic_system', 'id'=>50, 'slug' => 'option_project_smart_traffic_system'],
-                                ['value' => 'parking_reform', 'id'=>51, 'slug' => 'option_project_parking_reform'],
-                                ['value' => 'low_emission_zone', 'id'=>52, 'slug' => 'option_project_low_emission_zone'],
-                                ['value' => 'center_accessibility', 'id'=>53, 'slug' => 'option_project_center_accessibility'],
-                                ['value' => 'level_crossing_improvement','id'=>54, 'slug' => 'option_project_level_crossing_improvement'],
-                                ['value' => 'waterfront_redevelopment', 'id'=>55, 'slug' => 'option_project_waterfront_redevelopment'],
-                                ['value' => 'park_renovation', 'id'=>56, 'slug' => 'option_project_park_renovation'],
-                                ['value' => 'urban_tree_planting', 'id'=>57, 'slug' => 'option_project_urban_tree_planting'],
-                                ['value' => 'square_redesign', 'id'=>58, 'slug' => 'option_project_square_redesign'],
-                                ['value' => 'playground_safety', 'id'=>59, 'slug' => 'option_project_playground_safety'],
-                                ['value' => 'heat_island_mitigation', 'id'=>60, 'slug' => 'option_project_heat_island_mitigation'],
-                                ['value' => 'stream_deconcretization', 'id'=>61, 'slug' => 'option_project_stream_deconcretization'],
-                                ['value' => 'coastal_protection', 'id'=>62, 'slug' => 'option_project_coastal_protection'],
-                                ['value' => 'stormwater_management', 'id'=>63, 'slug' => 'option_project_stormwater_management'],
-                                ['value' => 'road_maintenance', 'id'=>64, 'slug' => 'option_project_road_maintenance'],
-                                ['value' => 'tunnel_safety_upgrade', 'id'=>65, 'slug' => 'option_project_tunnel_safety_upgrade'],
-                                ['value' => 'building_energy_retrofit', 'id'=>66, 'slug' => 'option_project_building_energy_retrofit'],
-                                ['value' => 'municipal_solar_installation','id'=>67, 'slug' => 'option_project_municipal_solar_installation'],
-                                ['value' => 'smart_city_sensors', 'id'=>68, 'slug' => 'option_project_smart_city_sensors'],
-                                ['value' => 'digital_services_platform', 'id'=>69, 'slug' => 'option_project_digital_services_platform'],
-                                ['value' => 'public_wifi_expansion', 'id'=>70, 'slug' => 'option_project_public_wifi_expansion'],
-                                ['value' => 'transparency_portal', 'id'=>71, 'slug' => 'option_project_transparency_portal'],
-                                ['value' => 'waste_optimization', 'id'=>72, 'slug' => 'option_project_waste_optimization'],
-                                ['value' => 'recycling_expansion', 'id'=>73, 'slug' => 'option_project_recycling_expansion'],
-                                ['value' => 'social_housing_renovation', 'id'=>74, 'slug' => 'option_project_social_housing_renovation'],
-                                ['value' => 'affordable_housing_plan', 'id'=>75, 'slug' => 'option_project_affordable_housing_plan'],
-                                ['value' => 'school_modernization', 'id'=>76, 'slug' => 'option_project_school_modernization'],
-                                ['value' => 'library_digitalization', 'id'=>77, 'slug' => 'option_project_library_digitalization'],
-                                ['value' => 'youth_center_expansion', 'id'=>78, 'slug' => 'option_project_youth_center_expansion'],
-                                ['value' => 'elderly_care_services', 'id'=>79, 'slug' => 'option_project_elderly_care_services'],
-                                ['value' => 'public_health_campaign', 'id'=>80, 'slug' => 'option_project_public_health_campaign'],
-                                ['value' => 'community_center_network', 'id'=>81, 'slug' => 'option_project_community_center_network'],
-                                ['value' => 'museum_expansion', 'id'=>82, 'slug' => 'option_project_museum_expansion'],
-                                ['value' => 'tourism_promotion', 'id'=>83, 'slug' => 'option_project_tourism_promotion'],
-                                ['value' => 'beach_sanitation', 'id'=>84, 'slug' => 'option_project_beach_sanitation'],
-                            ]
-                        ],
-                    ]
-                ],
-                [
-                    'id'=>85, 'slug' => 'section_priorities',
-                    'questions' => [
-                        [
-                            'id'=>86, 'slug' => 'question_priorities_ordered',
-                            'type' => 'ranking',
-                            'options' => [
-                                ['value' => 'car', 'id'=>87, 'slug' => 'option_priority_car'],
-                                ['value' => 'pedestrian', 'id'=>88, 'slug' => 'option_priority_pedestrian'],
-                                ['value' => 'cycling', 'id'=>89, 'slug' => 'option_priority_cycling'],
-                                ['value' => 'green', 'id'=>90, 'slug' => 'option_priority_green'],
-                                ['value' => 'family', 'id'=>91, 'slug' => 'option_priority_family'],
-                                ['value' => 'buses', 'id'=>92, 'slug' => 'option_priority_buses'],
-                                ['value' => 'drainage', 'id'=>93, 'slug' => 'option_priority_drainage'],
-                                ['value' => 'aesthetic', 'id'=>94, 'slug' => 'option_priority_aesthetic'],
-                            ]
-                        ],
-                        [
-                            'id'=>95, 'slug' => 'question_priorities_check',
-                            'type' => 'single',
-                            'options' => [
-                                ['value' => 'favour', 'id'=>96, 'slug' => 'option_favour'],
-                                ['value' => 'neutral', 'id'=>97, 'slug' => 'option_neutral'],
-                                ['value' => 'against', 'id'=>98, 'slug' => 'option_against'],
-                            ]
-                        ],
-                    ]
-                ]
-            ]
-        ]
-    ];
-    return $surveys[$id];
+    $posts = get_posts(array(
+        'name' => $name,
+        'post_type' => 'consulto_survey',
+        'post_status' => 'publish',
+        'posts_per_page' => 1));
+    if(empty($posts)) {
+        return null;
+    }
+    $raw = get_post_meta($posts[0]->ID, '_consulto_survey_schema', true);
+    $survey = json_decode($raw, true) ?: [];
+    return $survey;
 }
 
 function consulto_get_i18n_map() {
@@ -365,7 +174,7 @@ function consulto_get_i18n_map() {
         $raw = get_option('consulto_i18n_map', '{}');
         $map = json_decode($raw, true) ?: [];
     }
-    return $map;    
+    return $map;
 }
 
 // --- rest api i18n --------------------------------------------
