@@ -8,7 +8,8 @@ Plugin WordPress per la gestione di sondaggi con supporto a **voto preferenziale
 
 ## Funzionalità principali
 
-Il plugin supporta due modalità di voto preferenziale:
+Oltre ai soliti campi: selezione unica, selezione multipla, testo libero, numero intero compreso fra un minimo ed un massimo,
+il plugin supporta due modalità di voto preferenziale:
 
 * **Ranking completo su insieme piccolo di opzioni**
 
