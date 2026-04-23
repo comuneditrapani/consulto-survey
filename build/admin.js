@@ -37,16 +37,7 @@ function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 
 function App(_ref) {
   var postId = _ref.postId;
-  console.log("render");
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    var handler = function handler() {
-      console.log("PAGE RELOADING");
-    };
-    window.addEventListener("beforeunload", handler);
-    return function () {
-      window.removeEventListener("beforeunload", handler);
-    };
-  }, []);
+  var focusSectionId = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null),
     _useState2 = _slicedToArray(_useState, 2),
     survey = _useState2[0],
@@ -59,9 +50,11 @@ function App(_ref) {
     setSurvey(_objectSpread(_objectSpread({}, survey), patch));
   };
   var addSection = function addSection() {
+    var id = crypto.randomUUID();
+    focusSectionId.current = id;
     updateSurvey({
       sections: [].concat(_toConsumableArray(survey.sections), [{
-        id: crypto.randomUUID(),
+        id: id,
         slug: "",
         questions: []
       }])
@@ -78,6 +71,7 @@ function App(_ref) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Section__WEBPACK_IMPORTED_MODULE_2__["default"], {
       key: section.id,
       section: section,
+      autoFocus: focusSectionId.current === section.id,
       onChange: function onChange(updated) {
         var sections = _toConsumableArray(survey.sections);
         sections[i] = updated;
@@ -144,10 +138,15 @@ function OptionsEditor(_ref) {
     type: "button",
     onClick: addOption
   }, "+ option"), question.options.map(function (opt, i) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       key: opt.id,
+      style: {
+        display: "flex",
+        gap: 8
+      }
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
       value: opt.slug,
-      placeholder: "option",
+      placeholder: "option_slug",
       onChange: function onChange(e) {
         var options = _toConsumableArray(question.options);
         options[i] = _objectSpread(_objectSpread({}, opt), {}, {
@@ -157,7 +156,17 @@ function OptionsEditor(_ref) {
           options: options
         });
       }
-    });
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+      type: "button",
+      onClick: function onClick() {
+        var options = question.options.filter(function (_, idx) {
+          return idx !== i;
+        });
+        update({
+          options: options
+        });
+      }
+    }, "-"));
   }));
 }
 function renderByType(question, update) {
@@ -275,6 +284,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 
 function Section(_ref) {
   var section = _ref.section,
+    autoFocus = _ref.autoFocus,
     onChange = _ref.onChange;
   var update = function update(patch) {
     onChange(_objectSpread(_objectSpread({}, section), patch));
@@ -291,6 +301,12 @@ function Section(_ref) {
       }])
     });
   };
+  var slugRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    if (autoFocus && slugRef.current) {
+      slugRef.current.focus();
+    }
+  }, [autoFocus]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     style: {
       border: "1px solid #ccc",
@@ -298,6 +314,7 @@ function Section(_ref) {
       marginTop: 10
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("strong", null, "Section"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    ref: slugRef,
     placeholder: "Section slug",
     value: section.slug || "",
     onChange: function onChange(e) {

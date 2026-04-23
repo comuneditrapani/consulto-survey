@@ -1,19 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {loadSurvey, saveSurvey } from "./api";
 import Section from "./Section";
 
 export default function App({ postId }) {
-    console.log("render");
-    useEffect(() => {
-        const handler = () => {
-            console.log("PAGE RELOADING");
-        };
-        window.addEventListener("beforeunload", handler);
-        return () => {
-            window.removeEventListener("beforeunload", handler);
-        };
-    }, []);    
-
+    const focusSectionId = useRef(null);
     const [survey, setSurvey] = useState(null);
 
     useEffect(() => {
@@ -27,11 +17,14 @@ export default function App({ postId }) {
     };
 
     const addSection = () => {
+        const id = crypto.randomUUID();
+        focusSectionId.current = id;
+
         updateSurvey({
             sections: [
                 ...survey.sections,
                 {
-                    id: crypto.randomUUID(),
+                    id,
                     slug: "",
                     questions: []
                 }
@@ -49,6 +42,7 @@ export default function App({ postId }) {
                 <Section
                     key={section.id}
                     section={section}
+                    autoFocus={focusSectionId.current === section.id}
                     onChange={(updated) => {
                         const sections = [...survey.sections];
                         sections[i] = updated;

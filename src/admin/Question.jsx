@@ -20,16 +20,26 @@ export function OptionsEditor({ question, onChange }) {
                 + option
             </button>
             {question.options.map((opt, i) => (
-                <input
-                    key={opt.id}
-                    value={opt.slug}
-                    placeholder="option"
-                    onChange={(e) => {
-                        const options = [...question.options];
-                        options[i] = { ...opt, slug: e.target.value };
-                        update({ options });
-                    }}
-                />
+                <div key={opt.id} style={{ display: "flex", gap: 8 }}>
+                    <input
+                        value={opt.slug}
+                        placeholder="option_slug"
+                        onChange={(e) => {
+                            const options = [...question.options];
+                            options[i] = { ...opt, slug: e.target.value };
+                            update({ options });
+                        }}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const options = question.options.filter((_, idx) => idx !== i);
+                            update({ options });
+                        }}
+                    >
+                        -
+                    </button>
+                </div>
             ))}
         </div>
     );
