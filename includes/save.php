@@ -9,8 +9,23 @@ add_action('template_redirect', function() {
     }
     if (!isset($_POST['consulto_payload'])) return;
 
-    $data = json_decode(stripslashes($_POST['consulto_payload']), true);
-    if(!is_array($data)) return;
+    $payload = json_decode(stripslashes($_POST['consulto_payload']), true);
+
+    if (empty($payload) || empty($payload['survey_id']) || empty($payload['answers'])) {
+        return;
+    }
+
+    $survey_id = (int) $payload['survey_id'];
+    $answers   = $payload['answers'];
+
+    // validazione dati.
+    // la survey esiste come post ed è una survey.
+    $survey_post = get_post($survey_id);
+    if (!$survey_post || $survey_post->post_type !== 'consulto_survey') {
+        return;
+    }
+    // sono state fornite risposte, non un formulario vuoto.
+    if(!is_array($answers)) return;
 
     global $wpdb;
 
@@ -18,12 +33,13 @@ add_action('template_redirect', function() {
     $table_answers = $wpdb->prefix . 'consulto_answers';
 
     $wpdb->insert($table_replies, [
+        'survey_id' => $survey_id,
         'created_at' => current_time('mysql'),
     ]);
 
     $reply_id = $wpdb->insert_id;
 
-    foreach ($data as $question => $value) {
+    foreach ($answers as $question => $value) {
         if (is_array($value)) {
             $value = json_encode($value);
         }
@@ -38,5 +54,3 @@ add_action('template_redirect', function() {
     wp_redirect($_SERVER['REQUEST_URI']);
     exit;
 });
-
-

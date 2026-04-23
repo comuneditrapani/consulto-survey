@@ -43,6 +43,7 @@ function consulto_create_tables() {
     $sql1 = "CREATE TABLE $table_replies (
         id INT NOT NULL AUTO_INCREMENT,
         created_at DATETIME NOT NULL,
+        survey_id BIGINT UNSIGNED NOT NULL,
         PRIMARY KEY (id)
     ) $charset;";
 

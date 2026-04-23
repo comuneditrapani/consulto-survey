@@ -10,7 +10,11 @@
           return '<p>Survey non specificata</p>';
       }
 
-      $survey = consulto_get_survey($atts['survey']);
+      // l'utente passa il nome, ma noi memorizziamo l'ID, che è
+      // garantito non modificabile.
+      $survey_name = $atts['survey'];
+      $survey_id = consulto_get_survey_id($survey_name);
+      $survey = consulto_get_survey($survey_name);
 
       if (!$survey) {
           return '<p>Survey non trovata</p>';
@@ -23,7 +27,7 @@ window.consulto = window.consulto || {}; // potrebbe venire dal JS
 window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
 </script>
 
-<form id="consulto-form" method="post" data-config="<?= esc_attr(json_encode($survey)) ?>">
+<form id="consulto-form" method="post" data-config="<?= esc_attr(json_encode($survey)) ?>" data-survey-id="<?= $survey_id ?>">
   <?php wp_nonce_field('consulto_survey_submit', 'consulto_nonce'); ?>
   <input type="hidden" id="consulto-payload" name="consulto_payload" value="">
 
@@ -44,6 +48,20 @@ window.consulto.config = <?= json_encode($survey) ?>; // lo riscrivo!
         <input type="radio"
                data-question="<?= esc_attr($q['slug']) ?>"
                name="<?= esc_attr($q['slug']) ?>"
+               value="<?= esc_attr($opt['value']) ?>">
+        <?= esc_html($opt['label']) ?>
+      </label><br>
+      <?php
+           endforeach;
+
+        // MULTIPLE CHOICE
+        elseif ($q['type'] === 'multiple'):
+            foreach ($q['options'] as $opt):
+      ?>
+      <label>
+        <input type="checkbox"
+               data-question="<?= esc_attr($q['slug']) ?>"
+               name="<?= esc_attr($q['slug']) ?>[]"
                value="<?= esc_attr($opt['value']) ?>">
         <?= esc_html($opt['label']) ?>
       </label><br>

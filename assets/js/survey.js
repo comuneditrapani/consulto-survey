@@ -161,8 +161,15 @@ c.init.bindForm = function () {
     form.addEventListener('submit', function () {
         if(!c.ranking.enabled && c.ranking.question in c.answers)
             delete c.answers[c.ranking.question];
+        const surveyId = form.dataset.surveyId;
+
+        const payload = {
+            survey_id: parseInt(surveyId, 10),
+            answers: c.answers
+        };
+
         document.getElementById('consulto-payload').value =
-            JSON.stringify(c.answers);
+            JSON.stringify(payload);
     });
 };
 
