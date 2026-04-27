@@ -73,7 +73,12 @@ add_action('admin_enqueue_scripts', function ($hook) {
         filemtime(__DIR__ . '/build/admin.js'),
         true
     );
-
+    wp_enqueue_style(
+        'consulto-admin',
+        plugin_dir_url(__FILE__) . 'assets/css/survey.css',
+        [],
+        '1.0'
+    );
     wp_localize_script('consulto-survey-admin', 'ConsultoAPI', [
         'restUrl' => esc_url_raw(rest_url('consulto/v1')),
         'nonce'   => wp_create_nonce('wp_rest')

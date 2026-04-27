@@ -248,18 +248,24 @@ function consulto_autocomplete_handler(WP_REST_Request $request) {
         $match = null;
 
         // 1. match slug
-        if (str_starts_with($slug, $q)) {
+        if ($slug == $q) {
             $score = max($score, 100);
+            $match = 'slug_equals';
+        } elseif (str_ends_with($slug, $q)) {
+            $score = max($score, 90);
+            $match = 'slug_ends';
+        } elseif (str_starts_with($slug, $q)) {
+            $score = max($score, 70);
             $match = 'slug_starts';
         } elseif (strpos($slug, $q) !== false) {
-            $score = max($score, 70);
+            $score = max($score, 40);
             $match = 'slug_contains';
         }
 
         // 2. match label lingua corrente
         if ($item['lang'] === $lang) {
             if (str_starts_with($label, $q)) {
-                $score = max($score, 90);
+                $score = max($score, 80);
                 $match = 'label_starts_lang';
             } elseif (strpos($label, $q) !== false) {
                 $score = max($score, 60);
@@ -268,7 +274,7 @@ function consulto_autocomplete_handler(WP_REST_Request $request) {
         } else {
             // altre lingue (fallback debole)
             if (strpos($label, $q) !== false) {
-                $score = max($score, 40);
+                $score = max($score, 50);
                 $match = $match ?: 'label_contains_other_lang';
             }
         }

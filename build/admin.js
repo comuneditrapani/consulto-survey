@@ -141,6 +141,7 @@ function OptionsEditor(_ref) {
     onClick: addOption
   }, "+ option"), question.options.map(function (opt, i) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "editor-row",
       key: opt.id,
       style: {
         display: "flex",
@@ -250,7 +251,7 @@ function Question(_ref2) {
     value: "ranking-partial"
   }, "ranking-partial")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_SlugSelector__WEBPACK_IMPORTED_MODULE_1__["default"], {
     ref: slugRef,
-    value: question.slug || "",
+    value: question.slug,
     onChange: function onChange(slug) {
       return update({
         slug: slug
@@ -330,7 +331,7 @@ function Section(_ref) {
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("strong", null, "Section"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_SlugSelector__WEBPACK_IMPORTED_MODULE_1__["default"], {
     ref: slugRef,
-    value: section.slug || "",
+    value: section.slug,
     onChange: function onChange(slug) {
       return update({
         slug: slug
@@ -387,19 +388,32 @@ function SlugSelector(_ref) {
     _useState4 = _slicedToArray(_useState3, 2),
     results = _useState4[0],
     setResults = _useState4[1];
-  var isKnownSlug = results.some(function (r) {
-    return r.slug === query;
-  });
-  var isNewSlug = query && !isKnownSlug;
+  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null),
+    _useState6 = _slicedToArray(_useState5, 2),
+    selected = _useState6[0],
+    setSelected = _useState6[1];
+  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+    _useState8 = _slicedToArray(_useState7, 2),
+    open = _useState8[0],
+    setOpen = _useState8[1];
+
+  // --- fetch autocomplete results ---
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    if (!query || query.length < 2) return;
+    if (!query || query.length < 2) {
+      setResults([]);
+      return;
+    }
     var controller = new AbortController();
     var timeout = setTimeout(function () {
-      fetch("/wp-json/consulto/v1/autocomplete?q=".concat(query), {
-        signal: controller.signal
-      }).then(function (r) {
+      fetch("/wp-json/consulto/v1/autocomplete?q=".concat(query)).then(function (r) {
         return r.json();
-      }).then(setResults)["catch"](function () {});
+      }).then(function (data) {
+        // optional: ensure sorted by score
+        data.sort(function (a, b) {
+          return b.score - a.score;
+        });
+        setResults(data);
+      })["catch"](function () {});
     }, 250); // debounce
 
     return function () {
@@ -407,43 +421,148 @@ function SlugSelector(_ref) {
       controller.abort();
     };
   }, [query]);
+
+  // --- resolve initial value (important) ---
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    if (!value) return;
+    fetch("/wp-json/consulto/v1/autocomplete?q=".concat(value)).then(function (r) {
+      return r.json();
+    }).then(function (data) {
+      var match = data.find(function (r) {
+        return r.slug === value;
+      });
+      if (match) {
+        setSelected(match);
+        setQuery(match.slug);
+      }
+    })["catch"](function () {});
+  }, [value]);
+
+  // --- display label ---
+  var label = (selected === null || selected === void 0 ? void 0 : selected.label) || "";
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "slug-selector",
     style: {
-      marginTop: 8
+      position: "relative"
     }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "slug-row"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
     value: query,
     placeholder: "slug",
+    onFocus: function onFocus() {
+      return setOpen(true);
+    },
+    onBlur: function onBlur() {
+      setTimeout(function () {
+        return setOpen(false);
+      }, 150);
+    },
     onChange: function onChange(e) {
-      setQuery(e.target.value);
-      _onChange(e.target.value);
+      var val = e.target.value;
+      setQuery(val);
+      setSelected(null); // user is editing again
+      _onChange(val); // propagate raw slug
     }
-  }), results.length > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  }), selected && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "translation"
+  }, selected.label, " (", selected.lang, ")"), value && !selected && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "translation",
     style: {
-      border: "1px solid #ccc",
-      marginTop: 4
+      opacity: 0.6
     }
-  }, results.map(function (r, i) {
+  }, "resolving\u2026")), open && results.length > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "dropdown"
+  }, results.map(function (item) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      key: i,
+      key: item.slug,
       style: {
-        padding: 4,
+        padding: 6,
         cursor: "pointer"
       },
-      onClick: function onClick() {
-        setQuery(r.slug);
-        _onChange(r.slug);
-        setResults([]);
+      onMouseDown: function onMouseDown(e) {
+        e.preventDefault();
+        setSelected(item);
+        setQuery(item.slug);
+        setOpen(false);
+        _onChange(item.slug);
       }
-    }, r.slug);
-  })), isNewSlug && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    style: {
-      marginTop: 4,
-      fontSize: 12,
-      opacity: 0.7
-    }
-  }, "new slug: ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("b", null, query)));
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("b", null, item.slug), " \u2014 ", item.label, " (", item.lang, ")");
+  })));
 }
+{/*
+ import React, { useEffect, useState } from "react";
+ export default function SlugSelector({ value, onChange, currentLang, fetchResults }) {
+    const [query, setQuery] = useState(value || "");
+    const [results, setResults] = useState([]);
+    const [open, setOpen] = useState(false);
+    const isKnownSlug = results.some((r) => r.slug === query);
+    const isNewSlug = query && !isKnownSlug;
+    const label = selected?.label || "";
+     function getLabel(item, lang) {
+        if (!item) return "";
+        return (
+            item.translations?.[lang] ||
+                item.label ||
+                item.slug
+        );
+    }
+     useEffect(() => {
+        if (!query || query.length < 2) return;
+         const controller = new AbortController();
+         const timeout = setTimeout(() => {
+            fetch(`/wp-json/consulto/v1/autocomplete?q=${query}`, {
+                signal: controller.signal,
+            })
+                .then((r) => r.json())
+                .then(setResults)
+                .catch(() => {});
+        }, 250); // debounce
+         return () => {
+            clearTimeout(timeout);
+            controller.abort();
+        };
+    }, [query]);
+     return (
+        <div style={{ marginTop: 8 }}>
+             <input
+                value={
+                    selected
+                        ? `${selected.slug} — ${label}`
+                        : query
+                }
+                onChange={(e) => {
+                    setQuery(e.target.value);
+                    setSelected(null); // 👈 user is editing again
+                    onChange(e.target.value);
+                }}
+            />
+            {open && (
+                <div classname="dropdown">
+                    {results.map(item => (
+                        <div
+                            key={item.slug}
+                            onClick={() => {
+                                setSelected(item);
+                                setQuery(item.slug);
+                                onChange(item.slug);
+                            }}
+                        >
+                            <b>{item.slug}</b> — {item.label} ({item.lang})
+                        </div>
+                    ))}
+                </div>
+            )}
+             {isNewSlug && (
+                <div style={{ marginTop: 4, fontSize: 12, opacity: 0.7 }}>
+                    new slug: <b>{query}</b>
+                </div>
+             )}
+            
+        </div>
+    );
+ }
+ */}
 
 /***/ },
 

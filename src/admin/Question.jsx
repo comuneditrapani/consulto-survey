@@ -21,7 +21,7 @@ export function OptionsEditor({ question, onChange }) {
                 + option
             </button>
             {question.options.map((opt, i) => (
-                <div key={opt.id} style={{ display: "flex", gap: 8 }}>
+                <div className="editor-row" key={opt.id} style={{ display: "flex", gap: 8 }}>
                     <SlugSelector
                         value={opt.slug}
                         placeholder="option_slug"
