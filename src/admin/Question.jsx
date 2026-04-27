@@ -1,4 +1,5 @@
 import React, {useEffect, useRef} from "react";
+import SlugSelector from "./SlugSelector";
 
 export function OptionsEditor({ question, onChange }) {
     const update = (patch) => {
@@ -21,12 +22,12 @@ export function OptionsEditor({ question, onChange }) {
             </button>
             {question.options.map((opt, i) => (
                 <div key={opt.id} style={{ display: "flex", gap: 8 }}>
-                    <input
+                    <SlugSelector
                         value={opt.slug}
                         placeholder="option_slug"
-                        onChange={(e) => {
+                        onChange={(slug) => {
                             const options = [...question.options];
-                            options[i] = { ...opt, slug: e.target.value };
+                            options[i] = { ...opt, slug };
                             update({ options });
                         }}
                     />
@@ -100,11 +101,10 @@ export default function Question({ question, autoFocus, onChange }) {
                 <option value="ranking">ranking</option>
                 <option value="ranking-partial">ranking-partial</option>
             </select>
-            <input
+            <SlugSelector
                 ref={slugRef}
-                placeholder="Question slug"
-                value={question.slug || ""}
-                onChange={(e) => update({ slug: e.target.value})}
+                value={question.slug}
+                onChange={(slug) => update({ slug })}
             />
             <div style={{ marginTop: 8 }}>
                 {renderByType(question, update)}

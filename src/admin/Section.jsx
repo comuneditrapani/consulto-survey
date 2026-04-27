@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+import SlugSelector from "./SlugSelector";
 import Question from "./Question";
 
 export default function Section({ section, autoFocus, onChange }) {
@@ -36,11 +37,10 @@ export default function Section({ section, autoFocus, onChange }) {
         <div style={{ border: "1px solid #ccc", padding: 10, marginTop: 10 }}>
             <strong>Section</strong>
 
-            <input
+            <SlugSelector
                 ref= {slugRef}
-                placeholder="Section slug"
-                value={section.slug || ""}
-                onChange={(e) => update({ slug: e.target.value })}
+                value={section.slug}
+                onChange={(slug) => update({ slug })}
             />
 
             <br />
