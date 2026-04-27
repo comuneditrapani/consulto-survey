@@ -54,10 +54,11 @@
 /* liste */
 .consulto-list {
   border: 1px solid #ccc;
-  min-height: 300px;
+  min-height: 310px;
   max-height: 400px;
   overflow-y: auto;
   padding: 0.5rem;
+  margin: 0.25rem 0;
 }
 
 /* elementi */
@@ -98,4 +99,5 @@
 .consulto-ranking-widget h4 {
     margin-top: 0;
     margin-bottom: 0;
+    height: 1rem;
 }
