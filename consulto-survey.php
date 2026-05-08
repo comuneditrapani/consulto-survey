@@ -59,6 +59,19 @@ add_action('admin_init', function () {
     remove_post_type_support('consulto_survey', 'editor');
 });
 
+add_action('admin_menu', function () {
+    add_submenu_page(
+        'edit.php?post_type=consulto_survey',
+        'Traduzioni',
+        'Traduzioni',
+        'edit_posts',
+        'consulto-i18n',
+        function () {
+            echo '<div id="consulto-i18n-root"></div>';
+        }
+    );
+});
+
 add_action('admin_enqueue_scripts', function ($hook) {
 
     global $post;
@@ -80,6 +93,23 @@ add_action('admin_enqueue_scripts', function ($hook) {
         '1.0'
     );
     wp_localize_script('consulto-survey-admin', 'ConsultoAPI', [
+        'restUrl' => esc_url_raw(rest_url('consulto/v1')),
+        'nonce'   => wp_create_nonce('wp_rest')
+    ]);
+});
+
+add_action('admin_enqueue_scripts', function ($hook) {
+    if ($hook !== 'consulto_survey_page_consulto-i18n') {
+        return;
+    }
+    wp_enqueue_script(
+        'consulto-i18n-admin',
+        plugin_dir_url(__FILE__) . 'build/i18n.js',
+        ['wp-element'],
+        filemtime(__DIR__ . '/build/i18n.js'),
+        true
+    );
+    wp_localize_script('consulto-i18n-admin', 'ConsultoAPI', [
         'restUrl' => esc_url_raw(rest_url('consulto/v1')),
         'nonce'   => wp_create_nonce('wp_rest')
     ]);

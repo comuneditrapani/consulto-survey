@@ -3,11 +3,14 @@ const path = require("path");
 module.exports = {
   mode: "development",
 
-  entry: "./src/admin/index.js",
+  entry: {
+    admin: "./src/admin/index.js",
+    i18n: "./src/i18n/index.js",
+  },
 
   output: {
     path: path.resolve(__dirname, "build"),
-    filename: "admin.js"
+    filename: "[name].js"
   },
 
   module: {
