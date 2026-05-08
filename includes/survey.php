@@ -190,14 +190,6 @@ function consulto_get_i18n_map() {
     return $map;
 }
 
-// --- rest api i18n --------------------------------------------
-
-function consulto_rest_api_init () {
-    consulto_register_autocomplete_routes();
-    consulto_register_survey_routes();
-    // consulto_register_whatever_routes();
-}
-
 function consulto_rebuild_i18n_flat_cache() {
     $raw = get_option('consulto_i18n_map', '{}');
     $map = json_decode($raw, true) ?: [];
@@ -212,6 +204,15 @@ function consulto_rebuild_i18n_flat_cache() {
         }
     }
     set_transient('consulto_i18n_flat', $i18n_flat, HOUR_IN_SECONDS);
+}
+
+// --- rest api i18n --------------------------------------------
+
+function consulto_rest_api_init () {
+    consulto_register_autocomplete_routes();
+    consulto_register_survey_routes();
+    consulto_register_i18n_routes();
+    // consulto_register_whatever_routes();
 }
 
 function consulto_autocomplete_handler(WP_REST_Request $request) {
@@ -357,3 +358,81 @@ function consulto_register_survey_routes() {
         ]
     ]);
 }
+
+function consulto_register_i18n_routes() {
+    register_rest_route('consulto/v1', '/i18n', [
+        [
+            'methods'  => 'GET',
+            'callback' => function ($request) {
+                $raw = get_option('consulto_i18n_map', '{}');
+                return json_decode($raw, true) ?: [];
+            },
+            'permission_callback' => function () {
+                return current_user_can('edit_posts');
+            }
+        ],
+        [
+            'methods'  => 'POST',
+            'callback' => function ($request) {
+                $incoming = $request->get_json_params();
+                if (!is_array($incoming)) {
+                    return new WP_Error('invalid_data', 'Expected a JSON object', ['status' => 400]);
+                }
+                $raw = get_option('consulto_i18n_map', '{}');
+                $existing = json_decode($raw, true) ?: [];
+                // backup prima di modificare
+                update_option('consulto_i18n_map_backup', $raw);
+                // merge: i dati in arrivo sovrascrivono slug per slug,
+                // ma non cancellano slug assenti dalla richiesta
+                $merged = array_merge($existing, $incoming);
+                update_option('consulto_i18n_map', wp_json_encode($merged));
+                return ['ok' => true];
+            },
+            'permission_callback' => function () {
+                return current_user_can('edit_posts');
+            }
+        ]
+    ]);
+
+    register_rest_route('consulto/v1', '/i18n/(?P<slug>[a-z0-9_]+)', [
+        [
+            'methods'  => 'PUT',
+            'callback' => function ($request) {
+                $slug = $request['slug'];
+                $incoming = $request->get_json_params();
+                if (!is_array($incoming)) {
+                    return new WP_Error('invalid_data', 'Expected a JSON object', ['status' => 400]);
+                }
+                $raw = get_option('consulto_i18n_map', '{}');
+                $map = json_decode($raw, true) ?: [];
+                update_option('consulto_i18n_map_backup', $raw);
+                $map[$slug] = $incoming;
+                update_option('consulto_i18n_map', wp_json_encode($map));
+                return ['ok' => true];
+            },
+            'permission_callback' => function () {
+                return current_user_can('edit_posts');
+            }
+        ],
+        [
+            'methods'  => 'DELETE',
+            'callback' => function ($request) {
+                $slug = $request['slug'];
+                $raw = get_option('consulto_i18n_map', '{}');
+                $map = json_decode($raw, true) ?: [];
+                if (!array_key_exists($slug, $map)) {
+                    return new WP_Error('not_found', 'Slug not found', ['status' => 404]);
+                }
+                // backup prima di modificare
+                update_option('consulto_i18n_map_backup', $raw);
+                unset($map[$slug]);
+                update_option('consulto_i18n_map', wp_json_encode($map));
+                return ['ok' => true];
+            },
+            'permission_callback' => function () {
+                return current_user_can('edit_posts');
+            }
+        ]
+    ]);
+}
+
