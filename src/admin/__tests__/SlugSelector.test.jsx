@@ -83,3 +83,21 @@ test('selezionando un risultato onChange viene chiamato con lo slug', async () =
     expect(onChange).toHaveBeenCalledWith('trasporto_pubblico');
 });
 
+test('chiama autocomplete con il restUrl dal Context', async () => {
+    fetch.mockResolvedValueOnce({
+        json: async () => []
+    });
+
+    renderWithContext('', 'it');
+    const input = screen.getByPlaceholderText('slug');
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: 'trasporto' } });
+
+    await waitFor(() => {
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/wp-json/consulto/v1/autocomplete?q=trasporto',
+            expect.anything()
+        );
+    });
+});
+

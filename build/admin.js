@@ -469,7 +469,7 @@ var SlugSelector = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.forwardRef
     }
     var controller = new AbortController();
     var timeout = setTimeout(function () {
-      fetch("/wp-json/consulto/v1/autocomplete?q=".concat(query), {
+      fetch("".concat(window.ConsultoAPI.restUrl, "/autocomplete?q=").concat(query), {
         signal: controller.signal
       }).then(function (r) {
         return r.json();

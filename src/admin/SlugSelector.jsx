@@ -26,7 +26,7 @@ const SlugSelector = forwardRef(function SlugSelector({ value, onChange }, ref) 
         const controller = new AbortController();
 
         const timeout = setTimeout(() => {
-            fetch(`/wp-json/consulto/v1/autocomplete?q=${query}`, {
+            fetch(`${window.ConsultoAPI.restUrl}/autocomplete?q=${query}`, {
                 signal: controller.signal
             })
                 .then(r => r.json())
