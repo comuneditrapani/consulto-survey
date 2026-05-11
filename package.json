@@ -11,14 +11,29 @@
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.2",
     "@babel/preset-react": "^7.28.5",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "babel-jest": "^30.4.1",
     "babel-loader": "^10.1.1",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
     "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2"
   },
   "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "build": "webpack",
-      "watch": "webpack --watch"
+    "test": "jest",
+    "build": "webpack",
+    "watch": "webpack --watch"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+        "@testing-library/jest-dom",
+        "<rootDir>/jest.setup.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less)$": "<rootDir>/__mocks__/fileMock.js"
+    }
   },
   "repository": {
     "type": "git",
