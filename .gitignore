@@ -26,3 +26,8 @@ pnpm-debug.log*
 dist/
 *.map
 
+# generato da Composer
+vendor
+.phpunit.result.cache
+phpunit.xml
+/.circleci/
