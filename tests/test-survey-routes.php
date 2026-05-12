@@ -57,7 +57,7 @@ class SurveyRoutesTest extends WP_Test_REST_TestCase {
 				[ 'id' => 1, 'slug' => 'sec_a', 'questions' => [] ]
 			],
 		];
-		update_post_meta( $this->survey_id, '_consulto_survey_schema', wp_json_encode( $schema ) );
+		update_post_meta( $this->survey_id, '_consulto_survey_schema', wp_json_encode( $schema, JSON_UNESCAPED_UNICODE ) );
 
 		$response = $this->request( 'GET', "/consulto/v1/survey/{$this->survey_id}" );
 
@@ -130,4 +130,13 @@ class SurveyRoutesTest extends WP_Test_REST_TestCase {
 
 		$this->assertSame( 403, $response->get_status() );
 	}
+
+    public function test_post_survey_preserva_caratteri_utf8(): void {
+        $schema = [ 'title' => 'Sondaggio mobilità', 'sections' => [] ];
+
+        $this->request( 'POST', "/consulto/v1/survey/{$this->survey_id}", $schema );
+
+        $saved = json_decode( get_post_meta( $this->survey_id, '_consulto_survey_schema', true ), true );
+        $this->assertSame( 'Sondaggio mobilità', $saved['title'] );
+    }
 }

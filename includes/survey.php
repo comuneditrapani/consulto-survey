@@ -348,7 +348,7 @@ function consulto_register_survey_routes() {
                 update_post_meta(
                     $post_id,
                     '_consulto_survey_schema',
-                    wp_json_encode($data)
+                    wp_json_encode($data, JSON_UNESCAPED_UNICODE)
                 );
                 return ['ok' => true];
             },
