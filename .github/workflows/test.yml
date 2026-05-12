@@ -15,3 +15,53 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm test
+
+  phpunit:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wp_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mysqli
+
+      - name: Installa dipendenze Composer
+        run: composer install --prefer-dist --no-progress
+
+      - name: Scarica WordPress
+        run: |
+          git clone --depth=1 https://github.com/WordPress/wordpress-develop.git /tmp/wordpress-develop
+          git clone --depth=1 https://github.com/WordPress/wordpress.git /tmp/wordpress
+
+      - name: Configura wp-tests-config.php
+        run: |
+          cp /tmp/wordpress-develop/wp-tests-config-sample.php /tmp/wordpress-develop/tests/phpunit/wp-tests-config.php
+          sed -i "s/youremptytestdbnamehere/wp_test/" /tmp/wordpress-develop/tests/phpunit/wp-tests-config.php
+          sed -i "s/yourusernamehere/root/" /tmp/wordpress-develop/tests/phpunit/wp-tests-config.php
+          sed -i "s/yourpasswordhere/root/" /tmp/wordpress-develop/tests/phpunit/wp-tests-config.php
+          sed -i "s|localhost|127.0.0.1|" /tmp/wordpress-develop/tests/phpunit/wp-tests-config.php
+          sed -i "s|dirname( __FILE__ ) . '/src/'|'/tmp/wordpress/'|" /tmp/wordpress-develop/tests/phpunit/wp-tests-config.php
+          sed -i "s|__DIR__ . '/src/'|'/tmp/wordpress/'|" /tmp/wordpress-develop/tests/phpunit/wp-tests-config.php
+
+      - name: Crea tabelle WordPress nel database di test
+        run: |
+          mysql -u root -proot -h 127.0.0.1 wp_test < /tmp/wordpress/wp-admin/install.php || true
+
+      - name: Esegui PHPUnit
+        env:
+          WP_CORE_DIR: /tmp/wordpress
+          WP_TESTS_DIR: /tmp/wordpress-develop/tests/phpunit
+          WP_TESTS_PHPUNIT_POLYFILLS_PATH: ${{ github.workspace }}/vendor/yoast/phpunit-polyfills
+        run: ./vendor/bin/phpunit
