@@ -64,17 +64,21 @@ function consulto_create_tables() {
 
 // --- i18n -----------------------------------------------------
 
-function consulto_t($slug, $lang = 'it') {
-    static $map = null;
-    // l'inizializzazione statica con chiamata a funzione è
-    // supportata solo da PHP 8.1 in poi.
-    if ($map === null) {
-        $map = consulto_get_i18n_map();
+function consulto_t(string $slug, string $lang = 'it'): string {
+    global $consulto_i18n_cache;  // una globale, resettabile.
+    if ($consulto_i18n_cache === null) {  // inizializza
+        $consulto_i18n_cache = consulto_get_i18n_map();
     }
+    return $consulto_i18n_cache[$slug][$lang]
+        ?? $consulto_i18n_cache[$slug]['en']
+        ?? $slug;
+}
 
-    return $map[$slug][$lang]
-    ?? $map[$slug]['en']
-    ?? $slug;
+function consulto_t_reset(): void {
+    global $consulto_i18n_cache;  // stessa globale come sopra
+    $consulto_i18n_cache = null;  // la resetta
+    global $consulto_i18n_map_cache;
+    $consulto_i18n_map_cache = null;
 }
 
 // --- normalization --------------------------------------------
@@ -182,12 +186,12 @@ function consulto_get_raw_survey($survey_id) {
 }
 
 function consulto_get_i18n_map() {
-    static $map = null;
-    if ($map === null) {
+    global $consulto_i18n_map_cache;
+    if ($consulto_i18n_map_cache === null) {
         $raw = get_option('consulto_i18n_map', '{}');
-        $map = json_decode($raw, true) ?: [];
+        $consulto_i18n_map_cache = json_decode($raw, true) ?: [];
     }
-    return $map;
+    return $consulto_i18n_map_cache;
 }
 
 function consulto_rebuild_i18n_flat_cache() {
