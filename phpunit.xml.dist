@@ -9,8 +9,9 @@
     convertDeprecationsToExceptions="true"
     >
   <php>
-    <env name="WP_CORE_DIR" value="/var/www/wp-sandbox"/>
-    <env name="WP_TESTS_DIR" value="/var/www/wordpress-develop/tests/phpunit"/>
+    <env name="WP_CORE_DIR" value="/var/www/wp-sandbox" force="true"/>
+    <env name="WP_TESTS_DIR" value="/var/www/wordpress-develop/tests/phpunit" force="true"/>
+    <env name="WP_TESTS_PHPUNIT_POLYFILLS_PATH" value="/var/www/wp-sandbox/wp-content/plugins/consulto-survey/vendor/yoast/phpunit-polyfills" force="true"/>
   </php>
   <testsuites>
     <testsuite name="testing">

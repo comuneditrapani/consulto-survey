@@ -5,6 +5,18 @@
  * @package Consulto_Survey
  */
 
+$phpunit_xml = dirname( __DIR__ ) . '/phpunit.xml';
+if ( file_exists( $phpunit_xml ) ) {
+    $xml = simplexml_load_file( $phpunit_xml );
+    foreach ( $xml->php->env as $env ) {
+        $name  = (string) $env['name'];
+        $value = (string) $env['value'];
+        if ( ! getenv( $name ) ) {
+            putenv( "$name=$value" );
+        }
+    }
+}
+
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 
 if ( ! $_tests_dir ) {
