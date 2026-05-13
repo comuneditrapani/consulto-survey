@@ -25,7 +25,7 @@ affiancare al sito di sviluppo i file wordpress per i test (sparse checkout).
 
 qualche comando in pratica?
 
-$ mysql -u root -p -e 'CREATE DATABASE wp_sandbox_test;
+$ mysql -u root -p -e 'CREATE DATABASE wp_sandbox_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON wp_sandbox_test.* TO "wp_user"@"localhost";
 flush privileges;'
 
