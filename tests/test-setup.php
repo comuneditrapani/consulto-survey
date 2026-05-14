@@ -26,32 +26,47 @@ class SetupTest extends WP_UnitTestCase {
         $table_replies = $wpdb->prefix . 'consulto_replies';
         $table_answers = $wpdb->prefix . 'consulto_answers';
 
-        $found_replies = $wpdb->get_var(
-            $wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table_replies))
+        // Verifica robusta cross-DB: scriviamo davvero nelle tabelle create.
+        $insert_reply = $wpdb->insert(
+            $table_replies,
+            [
+                'created_at' => current_time('mysql'),
+                'survey_id' => 1,
+            ],
+            [
+                '%s',
+                '%d',
+            ]
         );
-        $found_answers = $wpdb->get_var(
-            $wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table_answers))
+
+        $this->assertNotFalse(
+            $insert_reply,
+            'Insert su consulto_replies fallita. last_error: ' . $wpdb->last_error
         );
 
-        if (!$found_replies) {
-            $found_replies = $wpdb->get_var(
-                $wpdb->prepare(
-                    'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s',
-                    $table_replies
-                )
-            );
-        }
+        $reply_id = (int) $wpdb->insert_id;
+        $this->assertGreaterThan(0, $reply_id, 'insert_id non valido per consulto_replies');
 
-        if (!$found_answers) {
-            $found_answers = $wpdb->get_var(
-                $wpdb->prepare(
-                    'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s',
-                    $table_answers
-                )
-            );
-        }
+        $insert_answer = $wpdb->insert(
+            $table_answers,
+            [
+                'reply_id' => $reply_id,
+                'question_id' => 'q1',
+                'value' => 'test',
+            ],
+            [
+                '%d',
+                '%s',
+                '%s',
+            ]
+        );
 
-        $this->assertNotEmpty($found_replies, 'consulto_replies non trovata. last_error: ' . $wpdb->last_error);
-        $this->assertNotEmpty($found_answers, 'consulto_answers non trovata. last_error: ' . $wpdb->last_error);
+        $this->assertNotFalse(
+            $insert_answer,
+            'Insert su consulto_answers fallita. last_error: ' . $wpdb->last_error
+        );
+
+        $answer_id = (int) $wpdb->insert_id;
+        $this->assertGreaterThan(0, $answer_id, 'insert_id non valido per consulto_answers');
     }
 }
