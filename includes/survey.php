@@ -82,6 +82,31 @@ function consulto_t_reset(): void {
     $consulto_i18n_map_cache = null;
 }
 
+function consulto_get_i18n_map() {
+    global $consulto_i18n_map_cache;
+    if ($consulto_i18n_map_cache === null) {
+        $raw = get_option('consulto_i18n_map', '{}');
+        $consulto_i18n_map_cache = json_decode($raw, true) ?: [];
+    }
+    return $consulto_i18n_map_cache;
+}
+
+function consulto_rebuild_i18n_flat_cache() {
+    $raw = get_option('consulto_i18n_map', '{}');
+    $map = json_decode($raw, true) ?: [];
+    $i18n_flat = [];
+    foreach ($map as $slug => $translations) {
+        foreach ($translations as $lang => $label) {
+            $i18n_flat[] = [
+                'slug'  => $slug,
+                'lang'  => $lang,
+                'label' => $label,
+            ];
+        }
+    }
+    set_transient('consulto_i18n_flat', $i18n_flat, HOUR_IN_SECONDS);
+}
+
 // --- normalization --------------------------------------------
 
 function consulto_normalize_entity($entity, $lang, $prefix) {
@@ -184,31 +209,6 @@ function consulto_get_raw_survey($survey_id) {
     $raw = get_post_meta($survey_id, '_consulto_survey_schema', true);
     $survey = json_decode($raw, true) ?: [];
     return $survey;
-}
-
-function consulto_get_i18n_map() {
-    global $consulto_i18n_map_cache;
-    if ($consulto_i18n_map_cache === null) {
-        $raw = get_option('consulto_i18n_map', '{}');
-        $consulto_i18n_map_cache = json_decode($raw, true) ?: [];
-    }
-    return $consulto_i18n_map_cache;
-}
-
-function consulto_rebuild_i18n_flat_cache() {
-    $raw = get_option('consulto_i18n_map', '{}');
-    $map = json_decode($raw, true) ?: [];
-    $i18n_flat = [];
-    foreach ($map as $slug => $translations) {
-        foreach ($translations as $lang => $label) {
-            $i18n_flat[] = [
-                'slug'  => $slug,
-                'lang'  => $lang,
-                'label' => $label,
-            ];
-        }
-    }
-    set_transient('consulto_i18n_flat', $i18n_flat, HOUR_IN_SECONDS);
 }
 
 // --- rest api i18n --------------------------------------------
