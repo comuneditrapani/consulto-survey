@@ -38,6 +38,7 @@ jobs:
         with:
           php-version: '8.4'
           extensions: mysqli
+          coverage: pcov
 
       - name: Installa dipendenze Composer
         run: composer install --prefer-dist --no-progress
@@ -69,6 +70,8 @@ jobs:
         run: php -d pcov.directory=${{ github.workspace }} ./vendor/bin/phpunit --coverage-clover coverage.xml --whitelist includes
 
       - name: Carica copertura su Coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        run: ./vendor/bin/php-coveralls --coverage_clover=coverage.xml -v
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage.xml
+          format: clover
