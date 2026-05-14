@@ -4,10 +4,5 @@
         "brain/monkey": "^2.7",
         "yoast/phpunit-polyfills": "^1.1",
         "php-coveralls/php-coveralls": "^2.9"
-    },
-    "autoload-dev": {
-        "files": [
-            "tests/bootstrap.php"
-        ]
     }
 }
