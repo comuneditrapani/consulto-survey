@@ -14,6 +14,7 @@ function consulto_get_survey($survey_name, $lang = 'it') {
 
 // --- custom post types ----------------------------------------
 
+/** @codeCoverageIgnore */
 function consulto_register_cpt_survey() {
     register_post_type('consulto_survey', [
         'labels' => [
