@@ -31,3 +31,6 @@ vendor
 .phpunit.result.cache
 phpunit.xml
 /.circleci/
+
+# generato da Coverage
+coverage.xml

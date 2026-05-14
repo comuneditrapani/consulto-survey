@@ -1,0 +1,2 @@
+service_name: github-actions
+coverage_clover: coverage.xml

@@ -66,4 +66,9 @@ jobs:
           WP_CORE_DIR: /tmp/wordpress
           WP_TESTS_DIR: /tmp/wordpress-develop/tests/phpunit
           WP_TESTS_PHPUNIT_POLYFILLS_PATH: ${{ github.workspace }}/vendor/yoast/phpunit-polyfills
-        run: ./vendor/bin/phpunit
+        run: php -d pcov.directory=${{ github.workspace }} ./vendor/bin/phpunit --coverage-clover coverage.xml
+
+      - name: Carica copertura su Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: ./vendor/bin/php-coveralls --coverage_clover=coverage.xml -v
