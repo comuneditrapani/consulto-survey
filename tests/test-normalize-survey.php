@@ -30,8 +30,8 @@
  * Sample test case.
  */
 class NormalizeSurveyTest extends WP_UnitTestCase {
-    protected function setUp(): void {
-        parent::setUp();
+    public static function setUpBeforeClass(): void {
+        parent::setUpBeforeClass();
         consulto_t_reset();
         update_option( 'consulto_i18n_map', wp_json_encode( [
             'option_transport' => ['it' => 'Trasporto pubblico',
