@@ -70,3 +70,50 @@ class SetupTest extends WP_UnitTestCase {
         $this->assertGreaterThan(0, $answer_id, 'insert_id non valido per consulto_answers');
     }
 }
+
+class ConsultoTCacheTest extends WP_UnitTestCase {
+    protected function setUp(): void {
+        parent::setUp();
+        update_option( 'consulto_i18n_map', wp_json_encode( [
+            'option_transport' => [
+                'it' => 'Trasporto pubblico',
+                'en' => 'Public transport',
+                'es' => 'Transporte público',
+            ],
+        ] ) );
+        consulto_t_reset();
+    }
+
+    public function test_consulto_t_cache_persists_after_update_option() {
+        $this->assertSame( 'Trasporto pubblico', consulto_t( 'option_transport', 'it' ) );
+        $this->assertSame( 'Public transport',   consulto_t( 'option_transport', 'en' ) );
+        $this->assertSame( 'Transporte público', consulto_t( 'option_transport', 'es' ) );
+        update_option( 'consulto_i18n_map', wp_json_encode( [
+            'option_transport' => [
+                'it' => 'Trasporto pubblico aggiornato',
+                'en' => 'Public transport, updated',
+                'es' => 'Transporte público puesto al día',
+            ],
+        ] ) );
+        $this->assertSame( 'Trasporto pubblico', consulto_t( 'option_transport', 'it' ) );
+        $this->assertSame( 'Public transport',   consulto_t( 'option_transport', 'en' ) );
+        $this->assertSame( 'Transporte público', consulto_t( 'option_transport', 'es' ) );
+    }
+    public function test_consulto_can_reset_i18n() {
+        $this->assertSame( 'Trasporto pubblico', consulto_t( 'option_transport', 'it' ) );
+        $this->assertSame( 'Public transport',   consulto_t( 'option_transport', 'en' ) );
+        $this->assertSame( 'Transporte público', consulto_t( 'option_transport', 'es' ) );
+        update_option( 'consulto_i18n_map', wp_json_encode( [
+            'option_transport' => [
+                'it' => 'Trasporto pubblico aggiornato',
+                'en' => 'Public transport, updated',
+                'es' => 'Transporte público puesto al día',
+            ],
+        ] ) );
+        consulto_t_reset();
+        $this->assertSame( 'Trasporto pubblico aggiornato', consulto_t( 'option_transport', 'it' ) );
+        $this->assertSame( 'Public transport, updated',   consulto_t( 'option_transport', 'en' ) );
+        $this->assertSame( 'Transporte público puesto al día', consulto_t( 'option_transport', 'es' ) );
+    }
+
+}
