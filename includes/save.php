@@ -53,6 +53,7 @@ function consulto_handle_survey_submit(): void {
     wp_redirect($_SERVER['REQUEST_URI']);
 }
 
+/** @codeCoverageIgnore */
 add_action('template_redirect', function() {
     consulto_handle_survey_submit();
     exit;
