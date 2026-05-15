@@ -8,7 +8,7 @@ class AutocompleteRouteTest extends WP_Test_REST_TestCase {
 
     private WP_REST_Server $server;
 
-    protected function setUp(): void {
+    public function setUp(): void {
         parent::setUp();
 
         global $wp_rest_server;
@@ -26,10 +26,12 @@ class AutocompleteRouteTest extends WP_Test_REST_TestCase {
             'option_transport' => [
                 'it' => 'Trasporto pubblico',
                 'en' => 'Public transport',
+                'es' => 'Transporte público',
             ],
             'option_park' => [
                 'it' => 'Parco pubblico',
                 'en' => 'Public park',
+                'fr' => 'Option parc public',
             ],
             'section_mobility' => [
                 'it' => 'Mobilità urbana',
@@ -102,9 +104,35 @@ class AutocompleteRouteTest extends WP_Test_REST_TestCase {
     // -----------------------------------------------------------------------
 
     public function test_slug_appare_una_sola_volta(): void {
-        $result = $this->autocomplete( 'blic' );
+        $result = $this->autocomplete( 'option' );
         $this->assertCount(2, $result);
         $slugs = array_column( $result, 'slug' );
         $this->assertSame( count( $slugs ), count( array_unique( $slugs ) ) );
     }
+
+    public function test_on_starting_label_chosen_language(): void {
+        $results = $this->autocomplete( 'transpo', 'es' );
+        $hits = array_values(
+            array_filter($results, fn($r) => $r['slug'] === 'option_transport'));
+        $this->assertSame([
+            ['slug' => 'option_transport',
+             'label' => 'Transporte público',
+             'lang' => 'es',
+             'match' => 'label_starts_lang',
+             'score' => 80,
+            ]], $hits);
+    }
+    
+    public function test_current_lang_label_match_wins_over_other_lang_in_match_field(): void {
+        $results = $this->autocomplete( 'transport', 'it' );
+        $hits = array_values(
+            array_filter( $results, fn($r) => $r['slug'] === 'option_transport' ) );
+        
+        $this->assertSame(['slug' => 'option_transport',
+                           'label' => 'Trasporto pubblico',
+                           'lang' => 'it',
+                           'match' => 'slug_ends',
+                           'score' => 90], $hits[0]);
+    }
+
 }
