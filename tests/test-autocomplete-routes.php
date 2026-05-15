@@ -135,4 +135,16 @@ class AutocompleteRouteTest extends WP_Test_REST_TestCase {
                            'score' => 90], $hits[0]);
     }
 
+    public function test_current_lang_label_contains_not_starts(): void {
+        $results = $this->autocomplete( 'pubblico', 'it' );
+        $hits = array_values(
+            array_filter( $results, fn($r) => $r['slug'] === 'option_transport' ) );
+        
+        $this->assertSame(['slug' => 'option_transport',
+                           'label' => 'Trasporto pubblico',
+                           'lang' => 'it',
+                           'match' => 'label_contains_lang',
+                           'score' => 60], $hits[0]);
+    }
+
 }
