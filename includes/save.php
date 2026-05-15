@@ -1,7 +1,6 @@
 <?php
 
-add_action('template_redirect', function() {
-
+function consulto_handle_survey_submit(): void {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') return;
     if (!isset($_POST['consulto_nonce']) ||
         !wp_verify_nonce($_POST['consulto_nonce'], 'consulto_survey_submit')) {
@@ -52,5 +51,9 @@ add_action('template_redirect', function() {
 
     // redirect DOPO che WP è pronto
     wp_redirect($_SERVER['REQUEST_URI']);
+}
+
+add_action('template_redirect', function() {
+    consulto_handle_survey_submit();
     exit;
 });
